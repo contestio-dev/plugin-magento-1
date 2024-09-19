@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+  <modules>
+    <Contestio_Connect>
+      <version>1.0.0</version>
+    </Contestio_Connect>
+  </modules>
+
+  <frontend>
+    <routers>
+      <contestio_connect>
+        <use>standard</use>
+        <args>
+          <module>Contestio_Connect</module>
+          <frontName>contestio</frontName>
+        </args>
+      </contestio_connect>
+    </routers>
+
+    <layout>
+      <updates>
+        <contestio_connect>
+          <file>contestio_connect.xml</file>
+        </contestio_connect>
+      </updates>
+    </layout>
+  </frontend>
+
+  <global>
+    <helpers>
+      <contestio_connect>
+        <class>Contestio_Connect_Helper</class>
+      </contestio_connect>
+    </helpers>
+    <blocks>
+      <contestio_connect>
+        <class>Contestio_Connect_Block</class>
+      </contestio_connect>
+    </blocks>
+  </global>
+
+  <adminhtml>
+    <acl>
+      <resources>
+        <admin>
+          <children>
+            <system>
+              <children>
+                <config>
+                  <children>
+                    <contestio_connect translate="title">
+                      <title>Configuration Contestio</title>
+                    </contestio_connect>
+                  </children>
+                </config>
+              </children>
+            </system>
+          </children>
+        </admin>
+      </resources>
+    </acl>
+  </adminhtml>
+</config>

@@ -1,0 +1,46 @@
+<div id="__next">
+<p>Contenu de test Next.js</p></div>
+
+<?php $chunkHash = $this->getNextJsChunkHash(); ?>
+<?php $mainHash = $this->getNextJsMainHash(); ?>
+<?php $mainAppJs = $this->getMainAppJsFile(); ?>
+<?php $pageJs = $this->getPageJsFile(); ?>
+
+<ul>
+    <li>chunkHash: <?php echo $chunkHash; ?></li>
+    <li>mainHash: <?php echo $mainHash; ?></li>
+    <li>mainAppJs: <?php echo $mainAppJs; ?></li>
+    <li>pageJs: <?php echo $pageJs; ?></li>
+</ul>
+
+<?php if ($chunkHash && $mainHash && $mainAppJs && $pageJs): ?>
+    <script src="<?php echo $this->getNextJsAppUrl(); ?>_next/static/chunks/<?php echo $mainHash; ?>.js"
+            onerror="console.error('Erreur de chargement:', this.src)"
+            onload="console.log('Chargé:', this.src)"></script>
+    <script src="<?php echo $this->getNextJsAppUrl(); ?>_next/static/chunks/<?php echo $mainAppJs; ?>"
+            onerror="console.error('Erreur de chargement:', this.src)"
+            onload="console.log('Chargé:', this.src)"></script>
+    <script src="<?php echo $this->getNextJsAppUrl(); ?>_next/static/<?php echo $chunkHash; ?>/_buildManifest.js"
+            onerror="console.error('Erreur de chargement:', this.src)"
+            onload="console.log('Chargé:', this.src)"></script>
+    <script src="<?php echo $this->getNextJsAppUrl(); ?>_next/static/<?php echo $chunkHash; ?>/_ssgManifest.js"
+            onerror="console.error('Erreur de chargement:', this.src)"
+            onload="console.log('Chargé:', this.src)"></script>
+    <script src="<?php echo $this->getNextJsAppUrl(); ?>_next/static/chunks/app/<?php echo $pageJs; ?>"
+            onerror="console.error('Erreur de chargement:', this.src)"
+            onload="console.log('Chargé:', this.src)"></script>
+<?php else: ?>
+    <p>Erreur : Impossible de charger les fichiers Next.js</p>
+<?php endif; ?>
+
+<script>
+console.log('Script de débogage exécuté');
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM chargé');
+    console.log('Contenu de __next:', document.getElementById('__next').innerHTML);
+});
+</script>
+
+<script>
+alert('Test JavaScript');
+</script>

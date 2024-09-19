@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<config>
+    <tabs>
+        <contestio translate="label" module="contestio_connect">
+            <label>Contestio</label>
+            <sort_order>100</sort_order>
+        </contestio>
+    </tabs>
+    <sections>
+        <contestio_connect translate="label" module="contestio_connect">
+            <label>Configuration Contestio</label>
+            <tab>contestio</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>1000</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <api_settings translate="label">
+                    <label>Paramètres API</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <api_key translate="label">
+                            <label>Clé API</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key>
+                        <api_secret translate="label">
+                            <label>Secret API</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_secret>
+                    </fields>
+                </api_settings>
+            </groups>
+        </contestio_connect>
+    </sections>
+</config>
