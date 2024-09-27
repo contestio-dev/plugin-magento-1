@@ -32,31 +32,75 @@ class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
         $method = $this->getRequest()->getMethod();
         $data = json_decode($this->getRequest()->getRawBody(), true);
 
+        $isImageRequest = isset($_FILES['file']) && !empty($_FILES['file']['tmp_name']);
+
         // $url = "https://api.contestio.fr/" . $endpoint;
         $url = "http://host.docker.internal:3000/" . $endpoint;
+
+        $customerId = Mage::getSingleton('customer/session')->getCustomer()->getId() ?? null;
+
+        // if $endpoint is `me`, return the customer data
+        if ($endpoint === 'me') {
+            $response = $this->getMe();
+            $this->getResponse()
+                ->setHeader('Content-type', 'application/json')
+                ->setBody(json_encode($response))
+                ->setHttpResponseCode(200);
+            return;
+        }
 
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
+            $isImageRequest
+                ? 'Content-Type: multipart/form-data'
+                : 'Content-Type: application/json',
             'clientkey: ' . $apiKey,
             'clientsecret: ' . $apiSecret,
-            'externalId: 2'
+            'externalId: ' . $customerId
         ]);
 
-        if (!empty($data)) {
+        // Check if file is present
+        if ($isImageRequest) {
+            curl_setopt($ch, CURLOPT_POSTFIELDS, [
+                'file' => new CURLFile($_FILES['file']['tmp_name'], $_FILES['file']['type'], $_FILES['file']['name'])
+            ]);
+        } else if (!empty($data)) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
         }
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
+        $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
         curl_close($ch);
+
+        // Check if the response is an image
+        if ($isImageRequest && $httpCode === 201 && strpos($contentType, 'image/webp') !== false) {
+            $response = base64_encode($response);
+        }
 
         $this->getResponse()
             ->setHeader('Content-type', 'application/json')
             ->setBody($response)
             ->setHttpResponseCode($httpCode);
+    }
+
+    private function getMe()
+    {
+        $customerId = Mage::getSingleton('customer/session')->getCustomer()->getId() ?? null;
+        $customer = Mage::getModel('customer/customer')->load($customerId);
+
+        // Add pseudo to customer array
+        $customer = Mage::getModel('customer/customer')->load($customerId);
+
+        $response = [
+            'id' => $customerId,
+            'email' => $customer->getEmail(),
+            'firstName' => $customer->getFirstname(),
+            'lastName' => $customer->getLastname(),
+        ];
+
+        return $response;
     }
 }

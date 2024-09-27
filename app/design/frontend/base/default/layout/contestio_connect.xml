@@ -1,40 +1,10 @@
 <?xml version="1.0"?>
 <layout version="0.1.0">
-  <contestio_connect_index_index>
-    <!-- Changer la structure du layout à une seule colonne -->
+  <default>
     <update handle="page_one_column"/>
 
-    <!-- <reference name="head">
-      <action method="addItem">
-        <type>skin_js</type><name>reactjs-app/index_bundle.js</name>
-      </action>
-    </reference> -->
-
-
-    <reference name="content">
-      <!-- <block type="contestio_connect/nextJs" name="contestio_nextjs" template="contestio/connect/nextjs.phtml" /> -->
-      <block type="contestio_connect/react" name="contestio_react" template="contestio/connect/react.phtml" />
-    </reference>
-    
-    <!-- Update page title
-    <reference name="head">
-      <action method="setTitle" translate="title">
-        <title>Contestio home</title>
-      </action>
-
-      <action method="addItem"><type>skin_css</type><name>css/contestio/style.css</name></action>
-      <action method="addItem"><type>skin_js</type><name>js/contestio/script.js</name></action>
-    </reference>
-
-    <reference name="content">
-      <block type="core/template" name="contestio.connect" template="contestio/connect.phtml"/>
-    </reference> -->
-  </contestio_connect_index_index>
-
-  <contestio_connect_contests_index>
-    <update handle="page_one_column"/>
     <reference name="content">
       <block type="contestio_connect/react" name="contestio_react" template="contestio/connect/react.phtml" />
     </reference>
-  </contestio_connect_contests_index>
+  </default>
 </layout>
