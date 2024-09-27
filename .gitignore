@@ -1,0 +1,52 @@
+# Ignorer tout
+*
+
+# Ne pas ignorer le dossier app et ses sous-dossiers
+!app/
+!app/*/
+!app/*/*/
+!app/*/*/*/
+!app/*/*/*/*/
+!app/*/*/*/*/*/
+
+# Ne pas ignorer les fichiers du plugin Contestio
+!app/code/local/Contestio/
+!app/code/local/Contestio/**
+
+# Ignorer à nouveau tout le reste dans app
+app/*
+!app/code/
+!app/design/
+!app/etc/
+app/code/*
+!app/code/local/
+app/code/local/*
+!app/code/local/Contestio/
+
+# Ne pas ignorer le fichier connect.xml spécifique
+app/design/adminhtml/
+app/design/frontend/default/
+app/design/frontend/rwd/
+app/design/install/
+app/design/frontend/base/default/etc/
+
+# Ne pas ignorer les nouveaux fichiers spécifiés
+!app/design/frontend/
+!app/design/frontend/base/
+!app/design/frontend/base/default/
+!app/design/frontend/base/default/layout/
+!app/design/frontend/base/default/layout/contestio_connect.xml
+!app/design/frontend/base/default/template/
+!app/design/frontend/base/default/template/connect.phtml
+!app/design/frontend/base/default/template/contestio/
+!app/design/frontend/base/default/template/contestio/**
+!app/etc/modules/
+!app/etc/modules/Contestio_Connect.xml
+
+# Ne pas ignorer le dossier skin et le sous-dossier spécifié
+!skin/
+!skin/frontend/
+!skin/frontend/base/
+!skin/frontend/base/default/
+!skin/frontend/base/default/reactjs-app/
+!skin/frontend/base/default/reactjs-app/**
