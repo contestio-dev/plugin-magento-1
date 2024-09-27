@@ -1,5 +1,6 @@
 # Ignorer tout
 *
+!/.gitignore
 
 # Ne pas ignorer le dossier app et ses sous-dossiers
 !app/
