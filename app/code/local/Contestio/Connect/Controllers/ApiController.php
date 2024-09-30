@@ -10,7 +10,7 @@ class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
         
         if ($origin === 'http://127.0.0.1:3001' || $origin === 'http://localhost:3001') {
             $response->setHeader('Access-Control-Allow-Origin', $origin);
-            $response->setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+            $response->setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE, PATCH');
             $response->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, clientkey, clientsecret, externalId');
             $response->setHeader('Access-Control-Allow-Credentials', 'true');
             $response->setHeader('Access-Control-Max-Age', '86400');
@@ -58,7 +58,8 @@ class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
                 : 'Content-Type: application/json',
             'clientkey: ' . $apiKey,
             'clientsecret: ' . $apiSecret,
-            'externalId: ' . $customerId
+            'externalId: 1',
+            // 'externalId: ' . $customerId,
         ]);
 
         // Check if file is present
