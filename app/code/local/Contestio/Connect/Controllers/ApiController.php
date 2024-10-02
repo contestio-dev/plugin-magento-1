@@ -34,9 +34,6 @@ class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
 
         $isImageRequest = isset($_FILES['file']) && !empty($_FILES['file']['tmp_name']);
 
-        // $url = "https://api.contestio.fr/" . $endpoint;
-        $url = "http://host.docker.internal:3000/" . $endpoint;
-
         $customerId = Mage::getSingleton('customer/session')->getCustomer()->getId() ?? null;
 
         // if $endpoint is `me`, return the customer data
@@ -47,7 +44,36 @@ class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
                 ->setBody(json_encode($response))
                 ->setHttpResponseCode(200);
             return;
+        } else if ($endpoint === 'pseudo' && $method === 'POST') {
+            $userData = $this->getMe();
+
+            // Check if user is logged in
+            if (!$userData) {
+                $response = ['success' => false, 'message' => 'Vous devez être connecté pour modifier votre pseudo.'];
+                $this->getResponse()
+                    ->setHeader('Content-type', 'application/json')
+                    ->setBody(json_encode($response))
+                    ->setHttpResponseCode(401);
+                return;
+            }
+
+            $pseudo = $data['pseudo'];
+
+            // Update endpoint
+            $endpoint = 'v1/users/final/upsert';
+
+            // New datas
+            $data = [
+                'externalId' => $userData['id'],
+                'email' => $userData['email'],
+                'fname' => $userData['firstName'],
+                'lname' => $userData['lastName'],
+                'pseudo' => $pseudo,
+            ];
         }
+
+        // $url = "https://api.contestio.fr/" . $endpoint;
+        $url = "http://host.docker.internal:3000/" . $endpoint;
 
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -58,8 +84,8 @@ class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
                 : 'Content-Type: application/json',
             'clientkey: ' . $apiKey,
             'clientsecret: ' . $apiSecret,
-            'externalId: 1',
-            // 'externalId: ' . $customerId,
+            // 'externalId: 1',
+            'externalId: ' . $customerId,
         ]);
 
         // Check if file is present

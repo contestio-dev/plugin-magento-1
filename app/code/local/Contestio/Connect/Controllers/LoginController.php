@@ -40,13 +40,13 @@ class Contestio_Connect_LoginController extends Mage_Core_Controller_Front_Actio
                 if ($session->isLoggedIn()) {
                     $response = ['success' => true];
                 } else {
-                    $response = ['success' => false, 'message' => 'Invalid login or password.'];
+                    $response = ['success' => false, 'message' => 'Identifiant ou mot de passe incorrect.'];
                 }
             } catch (Exception $e) {
                 $response = ['success' => false, 'message' => $e->getMessage()];
             }
         } else {
-            $response = ['success' => false, 'message' => 'Please provide both username and password.'];
+            $response = ['success' => false, 'message' => 'Veuillez fournir un identifiant et un mot de passe.'];
         }
 
         $this->getResponse()->setBody(Mage::helper('core')->jsonEncode($response));
