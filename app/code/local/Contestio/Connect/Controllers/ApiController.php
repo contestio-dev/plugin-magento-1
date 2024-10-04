@@ -72,8 +72,8 @@ class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
             ];
         }
 
-        // $url = "https://api.contestio.fr/" . $endpoint;
-        $url = "http://host.docker.internal:3000/" . $endpoint;
+        $url = "https://dev.api.contestio.fr/" . $endpoint;
+        // $url = "http://host.docker.internal:3000/" . $endpoint;
 
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
