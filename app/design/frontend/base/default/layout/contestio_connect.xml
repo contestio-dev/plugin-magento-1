@@ -1,10 +1,33 @@
 <?xml version="1.0"?>
 <layout version="0.1.0">
-  <default>
-    <update handle="page_one_column"/>
+    <contestio_connect_default>
+        <update handle="page_one_column"/>
+        <reference name="content">
+            <block type="contestio_connect/react" name="contestio_react" template="contestio/connect/react.phtml" />
+        </reference>
+    </contestio_connect_default>
 
-    <reference name="content">
-      <block type="contestio_connect/react" name="contestio_react" template="contestio/connect/react.phtml" />
-    </reference>
-  </default>
+    <contestio_connect_index_index>
+        <update handle="contestio_connect_default"/>
+    </contestio_connect_index_index>
+
+    <contestio_connect_contests_index>
+        <update handle="contestio_connect_default"/>
+    </contestio_connect_contests_index>
+
+    <contestio_connect_surveys_index>
+        <update handle="contestio_connect_default"/>
+    </contestio_connect_surveys_index>
+
+    <contestio_connect_profile_index>
+        <update handle="contestio_connect_default"/>
+    </contestio_connect_profile_index>
+
+    <contestio_connect_news_index>
+        <update handle="contestio_connect_default"/>
+    </contestio_connect_news_index>
+
+    <contestio_connect_error_index>
+        <update handle="contestio_connect_default"/>
+    </contestio_connect_error_index>
 </layout>
