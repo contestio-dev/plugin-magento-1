@@ -58,6 +58,7 @@ class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
             }
 
             $pseudo = $data['pseudo'];
+            $isFromContestio = $data['isFromContestio'];
 
             // Update endpoint
             $endpoint = 'v1/users/final/upsert';
@@ -69,6 +70,7 @@ class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
                 'fname' => $userData['firstName'],
                 'lname' => $userData['lastName'],
                 'pseudo' => $pseudo,
+                'isFromContestio' => $isFromContestio,
             ];
         }
 
@@ -84,7 +86,7 @@ class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
                 : 'Content-Type: application/json',
             'clientkey: ' . $apiKey,
             'clientsecret: ' . $apiSecret,
-            // 'externalId: 1',
+            // 'externalId: 4',
             'externalId: ' . $customerId,
         ]);
 
