@@ -33,9 +33,7 @@ class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
         $data = json_decode($this->getRequest()->getRawBody(), true);
         $userAgent = $this->getRequest()->getHeader('User-Agent');
 
-        // Get mobile or desktop
-        $device = $this->getRequest()->getHeader('Device');
-
+        // Get mobile or desktop with userAgent
         $isImageRequest = isset($_FILES['file']) && !empty($_FILES['file']['tmp_name']);
 
         $customerId = Mage::getSingleton('customer/session')->getCustomer()->getId() ?? null;
@@ -78,8 +76,8 @@ class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
             ];
         }
 
-        // $url = "https://dev.api.contestio.fr/" . $endpoint;
-        $url = "http://host.docker.internal:3000/" . $endpoint;
+        $url = "https://dev.api.contestio.fr/" . $endpoint;
+        // $url = "http://host.docker.internal:3000/" . $endpoint;
 
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -90,9 +88,9 @@ class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
                 : 'Content-Type: application/json',
             'clientkey: ' . $apiKey,
             'clientsecret: ' . $apiSecret,
-            'externalId: 4',
-            // 'externalId: ' . $customerId,
-            'clientconfig: ' . $device,
+            // 'externalId: 4',
+            'externalId: ' . $customerId,
+            'clientconfig: ' . $userAgent,
         ]);
 
         // Check if file is present
