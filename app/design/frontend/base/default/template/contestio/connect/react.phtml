@@ -4,6 +4,12 @@ $manifestJson = file_get_contents($reactAppUrl . 'manifest.json');
 $manifest = json_decode($manifestJson, true);
 ?>
 
+<style type="text/css">
+    .main-container {
+        padding: 0 !important;
+    }
+</style>
+
 <link rel="stylesheet" href="<?php echo $reactAppUrl . $manifest['main.css']; ?>" />
 <div id="root"></div>
 
