@@ -90,7 +90,7 @@ class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
             'clientsecret: ' . $apiSecret,
             // 'externalId: 4',
             'externalId: ' . $customerId,
-            'clientconfig: ' . $userAgent,
+            'clientuseragent: ' . $userAgent,
         ]);
 
         // Check if file is present
