@@ -31,6 +31,7 @@ class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
         $endpoint = $this->getRequest()->getParam('endpoint');
         $method = $this->getRequest()->getMethod();
         $data = json_decode($this->getRequest()->getRawBody(), true);
+        $userAgent = $this->getRequest()->getHeader('User-Agent');
 
         $isImageRequest = isset($_FILES['file']) && !empty($_FILES['file']['tmp_name']);
 
@@ -88,6 +89,7 @@ class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
             'clientsecret: ' . $apiSecret,
             // 'externalId: 4',
             'externalId: ' . $customerId,
+            'User-Agent: ' . $userAgent,
         ]);
 
         // Check if file is present
