@@ -664,6 +664,9 @@ video:where(#root,#root *) {
 .col-span-8 {
   grid-column: span 8 / span 8;
 }
+.m-0 {
+  margin: 0em;
+}
 .m-2 {
   margin: 0.5em;
 }
@@ -673,6 +676,10 @@ video:where(#root,#root *) {
 .-mx-1 {
   margin-left: -0.25em;
   margin-right: -0.25em;
+}
+.mx-1 {
+  margin-left: 0.25em;
+  margin-right: 0.25em;
 }
 .mx-3 {
   margin-left: 0.75em;
@@ -735,11 +742,17 @@ video:where(#root,#root *) {
 .ml-1 {
   margin-left: 0.25em;
 }
+.ml-2 {
+  margin-left: 0.5em;
+}
 .ml-5 {
   margin-left: 1.25em;
 }
 .ml-auto {
   margin-left: auto;
+}
+.mr-1 {
+  margin-right: 0.25em;
 }
 .mt-1 {
   margin-top: 0.25em;
@@ -1556,7 +1569,7 @@ video:where(#root,#root *) {
   color: rgb(107 114 128 / var(--tw-text-opacity));
 }
 .text-muted-foreground {
-  color: hsl(var(--contestio-uted-foreground));
+  color: hsl(var(--contestio-muted-foreground));
 }
 .text-popover-foreground {
   color: hsl(var(--contestio-popover-foreground));
@@ -1731,7 +1744,7 @@ video:where(#root,#root *) {
   color: hsl(var(--contestio-foreground));
 }
 .placeholder\:text-muted-foreground::placeholder {
-  color: hsl(var(--contestio-uted-foreground));
+  color: hsl(var(--contestio-muted-foreground));
 }
 .placeholder\:text-primary\/50::placeholder {
   color: hsl(var(--primary) / 0.5);
@@ -1935,7 +1948,7 @@ video:where(#root,#root *) {
   background-color: hsl(var(--contestio-accent));
 }
 .data-\[state\=open\]\:text-muted-foreground[data-state="open"] {
-  color: hsl(var(--contestio-uted-foreground));
+  color: hsl(var(--contestio-muted-foreground));
 }
 .data-\[disabled\]\:opacity-50[data-disabled] {
   opacity: 0.5;
