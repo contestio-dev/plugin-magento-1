@@ -1,6 +1,6 @@
 <?php
 $reactAppUrl = $this->getReactAppUrl();
-$manifestJson = file_get_contents($reactAppUrl . 'manifest.json');
+$manifestJson = file_get_contents($reactAppUrl . '/manifest.json');
 $manifest = json_decode($manifestJson, true);
 ?>
 
