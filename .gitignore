@@ -31,6 +31,7 @@ app/design/frontend/rwd/
 app/design/install/
 app/design/frontend/base/default/etc/
 
+
 # Ne pas ignorer les nouveaux fichiers spécifiés
 !app/design/frontend/
 !app/design/frontend/base/
@@ -43,5 +44,3 @@ app/design/frontend/base/default/etc/
 !app/design/frontend/base/default/template/contestio/**
 !app/etc/modules/
 !app/etc/modules/Contestio_Connect.xml
-!.github/workflows/deploy.yml
-
