@@ -43,11 +43,5 @@ app/design/frontend/base/default/etc/
 !app/design/frontend/base/default/template/contestio/**
 !app/etc/modules/
 !app/etc/modules/Contestio_Connect.xml
+!.github/workflows/deploy.yml
 
-# Ne pas ignorer le dossier skin et le sous-dossier spécifié
-!skin/
-!skin/frontend/
-!skin/frontend/base/
-!skin/frontend/base/default/
-!skin/frontend/base/default/reactjs-app/
-!skin/frontend/base/default/reactjs-app/**
