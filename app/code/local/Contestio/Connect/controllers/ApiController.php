@@ -41,81 +41,38 @@ class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
         // if $endpoint is `me`, return the customer data
         if ($endpoint === 'me') {
             $response = $this->getMe();
-            $this->getResponse()
-                ->setHeader('Content-type', 'application/json')
-                ->setBody(json_encode($response))
-                ->setHttpResponseCode(200);
+            $this->sendJsonResponse($response, 200);
             return;
         } else if ($endpoint === 'pseudo' && $method === 'POST') {
-            $userData = $this->getMe();
-
-            // Check if user is logged in
-            if (!$userData) {
-                $response = ['success' => false, 'message' => 'Vous devez être connecté pour modifier votre pseudo.'];
-                $this->getResponse()
-                    ->setHeader('Content-type', 'application/json')
-                    ->setBody(json_encode($response))
-                    ->setHttpResponseCode(401);
+            $response = $this->handlePseudoUpdate($data);
+            if (!$response['success']) {
+                $this->sendJsonResponse($response, 401);
                 return;
             }
-
-            $pseudo = $data['pseudo'];
-            $isFromContestio = $data['isFromContestio'];
-
-            // Update endpoint
             $endpoint = 'v1/users/final/upsert';
-
-            // New datas
-            $data = [
-                'externalId' => $userData['id'],
-                'email' => $userData['email'],
-                'fname' => $userData['firstName'],
-                'lname' => $userData['lastName'],
-                'pseudo' => $pseudo,
-                'isFromContestio' => $isFromContestio,
-            ];
+            $data = $response['data'];
         }
 
-        $url = "https://dev.api.contestio.fr/" . $endpoint;
-        // $url = "http://host.docker.internal:3000/" . $endpoint;
+        try {
+            if ($isImageRequest) {
+                // Traitement spécial pour les requêtes d'image
+                $response = $this->handleImageUpload($userAgent, $endpoint);
+            } else {
+                $response = $helper->callApi($userAgent, $endpoint, $method, $data);
+            }
 
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            $isImageRequest
-                ? 'Content-Type: multipart/form-data'
-                : 'Content-Type: application/json',
-            'clientkey: ' . $apiKey,
-            'clientsecret: ' . $apiSecret,
-            // 'externalId: 4',
-            'externalId: ' . $customerId,
-            'clientuseragent: ' . $userAgent,
-        ]);
-
-        // Check if file is present
-        if ($isImageRequest) {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, [
-                'file' => new CURLFile($_FILES['file']['tmp_name'], $_FILES['file']['type'], $_FILES['file']['name'])
-            ]);
-        } else if (!empty($data)) {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+            $this->sendJsonResponse($response, 200);
+        } catch (Exception $e) {
+            $this->sendJsonResponse(['error' => $e->getMessage()], 500);
         }
+    }
 
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-        curl_close($ch);
-
-        // Check if the response is an image
-        if ($isImageRequest && $httpCode === 201 && strpos($contentType, 'image/webp') !== false) {
-            $response = base64_encode($response);
-        }
-
+    private function sendJsonResponse($data, $statusCode)
+    {
         $this->getResponse()
             ->setHeader('Content-type', 'application/json')
-            ->setBody($response)
-            ->setHttpResponseCode($httpCode);
+            ->setBody(json_encode($data))
+            ->setHttpResponseCode($statusCode);
     }
 
     private function getMe()
@@ -134,5 +91,42 @@ class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
         ];
 
         return $response;
+    }
+
+    private function handlePseudoUpdate($data)
+    {
+        $userData = $this->getMe();
+        if (!$userData) {
+            return ['success' => false, 'message' => 'Vous devez être connecté pour modifier votre pseudo.'];
+        }
+
+        return [
+            'success' => true,
+            'data' => [
+                'externalId' => $userData['id'],
+                'email' => $userData['email'],
+                'fname' => $userData['firstName'],
+                'lname' => $userData['lastName'],
+                'pseudo' => $data['pseudo'],
+                'isFromContestio' => $data['isFromContestio'],
+            ]
+        ];
+    }
+
+    private function handleImageUpload($userAgent, $endpoint)
+    {
+        if (!isset($_FILES['file']) || empty($_FILES['file']['tmp_name'])) {
+            throw new Exception("Aucun fichier n'a été téléchargé");
+        }
+
+        $file = $_FILES['file'];
+        $helper = Mage::helper('contestio_connect/api');
+
+        try {
+            $response = $helper->uploadImage($userAgent, $endpoint, $file);
+            return $response;
+        } catch (Exception $e) {
+            throw new Exception("Erreur lors du téléchargement de l'image : " . $e->getMessage());
+        }
     }
 }

@@ -1,8 +1,13 @@
 <?php
-class Contestio_Connect_SurveysController extends Mage_Core_Controller_Front_Action
+
+require_once 'Abstract.php';
+
+class Contestio_Connect_SurveysController extends Contestio_Connect_Controller_Abstract
 {
     public function indexAction()
     {
+        parent::printMetaTags();
+
         $this->loadLayout();
         $this->renderLayout();
     }
