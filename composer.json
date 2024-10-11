@@ -12,7 +12,6 @@
         ]
     },
     "require": {
-        "magento-hackathon/magento-composer-installer": "*",
         "php": ">=7.0"
     },
     "license": "proprietary",
