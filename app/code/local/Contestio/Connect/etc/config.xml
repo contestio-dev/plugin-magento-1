@@ -32,11 +32,24 @@
         <class>Contestio_Connect_Helper</class>
       </contestio_connect>
     </helpers>
+
     <blocks>
       <contestio_connect>
         <class>Contestio_Connect_Block</class>
       </contestio_connect>
     </blocks>
+
+    <events>
+      <sales_order_place_after>
+        <observers>
+          <contestio_order_placed>
+            <type>singleton</type>
+            <class>Contestio_Connect_Model_Observer</class>
+            <method>orderPlaced</method>
+          </contestio_order_placed>
+        </observers>
+      </sales_order_place_after>
+    </events>
   </global>
 
   <adminhtml>
