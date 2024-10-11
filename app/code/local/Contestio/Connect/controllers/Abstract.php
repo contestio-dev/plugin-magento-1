@@ -8,7 +8,6 @@ abstract class Contestio_Connect_Controller_Abstract extends Mage_Core_Controlle
         $currentUrl = Mage::helper('core/url')->getCurrentUrl();
         $userAgent = $this->getRequest()->getHeader('User-Agent');
 
-
         // Default meta data
         $metaData = array(
             'title' => null,
@@ -19,10 +18,10 @@ abstract class Contestio_Connect_Controller_Abstract extends Mage_Core_Controlle
 
         try {
             // Get composer.json version
-            $composerJson = json_decode(file_get_contents('composer.json'), true);
-            $version = $composerJson['version'];
+            // $composerJson = json_decode(file_get_contents('composer.json'), true);
+            // $version = $composerJson['version'];
 
-            echo "<meta name='contestio-version-plugin' content='".$version."'>";
+            // echo "<meta name='contestio-version-plugin' content='".$version."'>";
 
             // Utiliser le helper API pour faire l'appel
             $helper = Mage::helper('contestio_connect/api');
