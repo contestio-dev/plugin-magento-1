@@ -12,8 +12,8 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
         $this->apiKey = Mage::getStoreConfig('contestio_connect/api_settings/api_key');
         $this->apiSecret = Mage::getStoreConfig('contestio_connect/api_settings/api_secret');
         $this->customerId = Mage::getSingleton('customer/session')->getCustomer()->getId() ?? null;
-        $this->baseUrl = "https://dev.api.contestio.fr/";
-        // $this->baseUrl = "http://host.docker.internal:3000/";
+        // $this->baseUrl = "https://dev.api.contestio.fr/";
+        $this->baseUrl = "http://host.docker.internal:3000/";
     }
 
     private function getUrl($endpoint)
