@@ -13,6 +13,7 @@
 # Ne pas ignorer les fichiers du plugin Contestio
 !app/code/local/Contestio/
 !app/code/local/Contestio/**
+!composer.json
 
 # Ignorer à nouveau tout le reste dans app
 app/*
