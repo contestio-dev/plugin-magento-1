@@ -21,12 +21,17 @@
             "email": "contact@contestio.fr"
         }
     ],
-    "version": "1.0.2",
+    "version": "1.0.3",
     "minimum-stability": "stable",
     "prefer-stable": true,
     "autoload": {
         "psr-0": {
             "Contestio_Connect": "app/code/local/"
+        }
+    },
+    "config": {
+        "platform": {
+            "php": ">=7.0"
         }
     }
 }
