@@ -1,17 +1,11 @@
 <?php
 $reactAppUrl = $this->getReactAppUrl();
-$manifestJson = file_get_contents($reactAppUrl . '/manifest.json');
+$manifestJson = file_get_contents($reactAppUrl . '/manifest.json' . '?v=' . time());
 $manifest = json_decode($manifestJson, true);
 ?>
 
-<style type="text/css">
-    .main-container {
-        padding: 0 !important;
-    }
-</style>
-
 <link rel="stylesheet" href="<?php echo $reactAppUrl . $manifest['main.css']; ?>" />
-<div id="root"></div>
+<div id="contestio-root"></div>
 
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -21,14 +15,12 @@ $manifest = json_decode($manifestJson, true);
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM chargé');
-    var rootElement = document.getElementById('root');
-    console.log('Élément root:', rootElement);
+    const rootElement = document.getElementById('contestio-root');
     
     if (rootElement) {
-        console.log('Application React chargée');
+        console.log('Application React loaded');
     } else {
-        console.error("Élément 'root' non trouvé");
+        console.error("Element 'contestio-root' not found");
     }
 });
 </script>

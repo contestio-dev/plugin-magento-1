@@ -18,7 +18,7 @@ class Contestio_Connect_LoginController extends Mage_Core_Controller_Front_Actio
         if ($origin === 'http://127.0.0.1:3001' || $origin === 'http://localhost:3001') {
             $response->setHeader('Access-Control-Allow-Origin', $origin);
             $response->setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-            $response->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, clientkey, clientsecret, externalId');
+            $response->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, clientkey, clientsecret, externalId, cache-control, pragma, expires');
             $response->setHeader('Access-Control-Allow-Credentials', 'true');
             $response->setHeader('Access-Control-Max-Age', '86400');
         }
@@ -30,8 +30,9 @@ class Contestio_Connect_LoginController extends Mage_Core_Controller_Front_Actio
     }
     public function postAction()
     {
-        $username = $this->getRequest()->getPost('username');
-        $password = $this->getRequest()->getPost('password');
+        $content = json_decode($this->getRequest()->getRawBody(), true);
+        $username = $content['username'] ?? null;
+        $password = $content['password'] ?? null;
 
         if ($username && $password) {
             try {
@@ -43,7 +44,7 @@ class Contestio_Connect_LoginController extends Mage_Core_Controller_Front_Actio
                     $response = ['success' => false, 'message' => 'Identifiant ou mot de passe incorrect.'];
                 }
             } catch (Exception $e) {
-                $response = ['success' => false, 'message' => $e->getMessage()];
+                $response = ['success' => false, 'message' => 'Identifiant ou mot de passe incorrect.'];
             }
         } else {
             $response = ['success' => false, 'message' => 'Veuillez fournir un identifiant et un mot de passe.'];
