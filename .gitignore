@@ -15,6 +15,7 @@
 !app/code/local/Contestio/**
 !composer.json
 !LICENSE
+!modman
 
 # Ignorer à nouveau tout le reste dans app
 app/*
