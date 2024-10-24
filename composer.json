@@ -1,7 +1,7 @@
 {
     "name": "contestio/magento1",
     "description": "Plugin Contestio pour Magento 1.9",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "type": "magento-module",
     "require": {
         "php": ">=7.0",
@@ -25,5 +25,8 @@
         "platform": {
             "php": "7.0"
         }
+    },
+    "extra": {
+        "magento-root-dir": "./"
     }
 }
