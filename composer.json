@@ -1,19 +1,11 @@
 {
     "name": "contestio/magento1",
     "description": "Plugin Contestio pour Magento 1.9",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "type": "magento-module",
-    "extra": {
-        "magento-root-dir": ".",
-        "map": [
-            ["app/code/local/Contestio/Connect", "app/code/local/Contestio/Connect"],
-            ["app/design/frontend/base/default/layout/contestio_connect.xml", "app/design/frontend/base/default/layout/contestio_connect.xml"],
-            ["app/design/frontend/base/default/template/contestio", "app/design/frontend/base/default/template/contestio"],
-            ["app/etc/modules/Contestio_Connect.xml", "app/etc/modules/Contestio_Connect.xml"]
-        ]
-    },
     "require": {
-        "php": ">=7.0"
+        "php": ">=7.0",
+        "magento-hackathon/magento-composer-installer": "*"
     },
     "license": "proprietary",
     "authors": [
@@ -28,6 +20,15 @@
         "psr-0": {
             "Contestio_Connect": "app/code/local/"
         }
+    },
+    "extra": {
+        "magento-root-dir": ".",
+        "map": [
+            ["app/code/local/Contestio/Connect", "app/code/local/Contestio/Connect"],
+            ["app/design/frontend/base/default/layout/contestio_connect.xml", "app/design/frontend/base/default/layout/contestio_connect.xml"],
+            ["app/design/frontend/base/default/template/contestio", "app/design/frontend/base/default/template/contestio"],
+            ["app/etc/modules/Contestio_Connect.xml", "app/etc/modules/Contestio_Connect.xml"]
+        ]
     },
     "config": {
         "platform": {
