@@ -1,7 +1,7 @@
 {
     "name": "contestio/magento1",
     "description": "Plugin Contestio pour Magento 1.9",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "type": "magento-module",
     "require": {
         "php": ">=7.0",
@@ -20,15 +20,6 @@
         "psr-0": {
             "Contestio_Connect": "app/code/local/"
         }
-    },
-    "extra": {
-        "magento-root-dir": ".",
-        "map": [
-            ["app/code/local/Contestio/Connect", "app/code/local/Contestio/Connect"],
-            ["app/design/frontend/base/default/layout/contestio_connect.xml", "app/design/frontend/base/default/layout/contestio_connect.xml"],
-            ["app/design/frontend/base/default/template/contestio", "app/design/frontend/base/default/template/contestio"],
-            ["app/etc/modules/Contestio_Connect.xml", "app/etc/modules/Contestio_Connect.xml"]
-        ]
     },
     "config": {
         "platform": {
