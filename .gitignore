@@ -44,5 +44,6 @@ app/design/frontend/base/default/etc/
 !app/design/frontend/base/default/template/
 !app/design/frontend/base/default/template/contestio/
 !app/design/frontend/base/default/template/contestio/react.phtml
+!app/design/frontend/base/default/template/contestio/meta_tags.phtml
 !app/etc/modules/
 !app/etc/modules/Contestio_Connect.xml
