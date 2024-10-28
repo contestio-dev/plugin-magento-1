@@ -3,7 +3,7 @@
     "type": "magento-module",
     "license": "proprietary",
     "description":"Plugin Contestio pour Magento 1.x",
-    "version": "1.0.13",
+    "version": "1.0.14",
     "authors":[
         {
             "name":"Contestio",

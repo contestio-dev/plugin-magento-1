@@ -27,7 +27,6 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
             'Content-Type: ' . $contentType,
             'clientkey: ' . $this->apiKey,
             'clientsecret: ' . $this->apiSecret,
-            'externalId: ' . $this->customerId,
         ];
     }
 
@@ -36,9 +35,12 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
         $ch = curl_init($this->getUrl($endpoint));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-        
+
         $headers = $this->getHeaders();
         $headers[] = 'clientuseragent: ' . $userAgent;
+        if ($this->customerId) {
+            $headers[] = 'externalid: ' . $this->customerId;
+        }
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         if (!empty($data)) {
@@ -48,8 +50,8 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
-
-        if ($httpCode >= 200 && $httpCode < 300) {
+	
+	    if ($httpCode >= 200 && $httpCode < 300) {
             return json_decode($response, true);
         } else {
             throw new Exception($response, $httpCode);
@@ -61,9 +63,13 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
         $ch = curl_init($this->getUrl($endpoint));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
-        
+
+
         $headers = $this->getHeaders('multipart/form-data');
         $headers[] = 'clientuseragent: ' . $userAgent;
+        if ($this->customerId) {
+            $headers[] = 'externalid: ' . $this->customerId;
+        }
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         $postFields = [
