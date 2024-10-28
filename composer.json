@@ -3,7 +3,7 @@
     "type": "magento-module",
     "license": "proprietary",
     "description":"Plugin Contestio pour Magento 1.x",
-    "version": "1.0.12",
+    "version": "1.0.13",
     "authors":[
         {
             "name":"Contestio",
@@ -11,14 +11,21 @@
         }
     ],
     "require": {
-        "magento-hackathon/magento-composer-installer": "*"
+        "magento-hackathon/magento-composer-installer": "^4.0"
+    },
+    "autoload": {
+      "files": [
+        "app/code/local/Contestio/Connect/Helper/Data.php",
+        "app/code/local/Contestio/Connect/Helper/Api.php"
+      ]
     },
     "extra": {
-        "map": [
-            ["app/code/local/Contestio/Connect", "app/code/local/Contestio/Connect"],
-            ["app/design/frontend/base/default/layout/contestio_connect.xml", "app/design/frontend/base/default/layout/contestio_connect.xml"],
-            ["app/design/frontend/base/default/template/contestio/react.phtml", "app/design/frontend/base/default/template/contestio/react.phtml"],
-            ["app/etc/modules/Contestio_Connect.xml", "app/etc/modules/Contestio_Connect.xml"]
-        ]
+      "map": [["app/design/frontend/base/default/layout/contestio_connect.xml", "app/design/frontend/base/default/layout/contestio_connect.xml"], ["app/design/frontend/base/default/template/contestio/meta_tags.phtml", "app/design/frontend/base/default/template/contestio/meta_tags.phtml"], ["app/code/local/Contestio/Connect/etc/config.xml", "app/code/local/Contestio/Connect/etc/config.xml"], ["app/etc/modules/Contestio_Connect.xml", "app/etc/modules/Contestio_Connect.xml"], ["app/code/local/Contestio/Connect/controllers/ApiController.php", "app/code/local/Contestio/Connect/controllers/ApiController.php"]],
+        "magento-root-dir": "."
+    },
+    "config": {
+        "allow-plugins": {
+            "magento-hackathon/magento-composer-installer": true
+        }
     }
 }
