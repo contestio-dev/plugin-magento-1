@@ -3,7 +3,7 @@
     "type": "magento-module",
     "license": "proprietary",
     "description":"Plugin Contestio pour Magento 1.x",
-    "version": "1.0.17",
+    "version": "1.0.18",
     "authors":[
         {
             "name":"Contestio",
@@ -12,6 +12,12 @@
     ],
     "require": {
         "magento-hackathon/magento-composer-installer": "^4.0"
+    },
+    "autoload": {
+      "files": [
+        "app/code/local/Contestio/Connect/Helper/Data.php",
+        "app/code/local/Contestio/Connect/Helper/Api.php"
+      ]
     },
     "extra": {
       "map": [
@@ -34,7 +40,7 @@
         ["app/code/local/Contestio/Connect/Model/Observer.php", "app/code/local/Contestio/Connect/Model/Observer.php"],
         ["app/code/local/Contestio/Connect/Block/React.php", "app/code/local/Contestio/Connect/Block/React.php"]
       ],
-      "magento-root-dir": "."
+      "magento-root-dir": "/"
     },
     "config": {
         "allow-plugins": {
