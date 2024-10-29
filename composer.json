@@ -3,7 +3,7 @@
   "type": "magento-module",
   "license": "proprietary",
   "description":"Plugin Contestio pour Magento 1.x",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "authors":[
       {
           "name":"Contestio",
@@ -27,7 +27,15 @@
       ],
       "magento-force": true,
       "magento-root-dir": ".",
-      "with-bootstrap-patch": false
+      "with-bootstrap-patch": false,
+      "magento-deploystrategy": "copy",
+      "magento-deploy-strategy": "copy",
+      "map": [
+          ["app/code/local/Contestio/Connect", "app/code/local/Contestio/Connect"],
+          ["app/design/frontend/base/default/layout/contestio_connect.xml", "app/design/frontend/base/default/layout/contestio_connect.xml"],
+          ["app/design/frontend/base/default/template/contestio", "app/design/frontend/base/default/template/contestio"],
+          ["app/etc/modules/Contestio_Connect.xml", "app/etc/modules/Contestio_Connect.xml"]
+      ]
   },
   "config": {
       "allow-plugins": {
