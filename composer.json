@@ -3,33 +3,28 @@
   "type": "magento-module",
   "license": "proprietary",
   "description": "Plugin Contestio pour Magento 1.x",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "authors": [
-      {
-          "name": "Contestio",
-          "email": "contact@contestio.fr"
-      }
+    {
+      "name": "Contestio",
+      "email": "contact@contestio.fr"
+    }
   ],
   "require": {
-      "magento-hackathon/magento-composer-installer": "^3.0"
+    "magento-hackathon/magento-composer-installer": "^3.0"
+  },
+  "autoload": {
+    "files": [
+      "app/code/local/Contestio/Connect/Helper/Data.php",
+      "app/code/local/Contestio/Connect/Helper/Api.php"
+    ]
   },
   "extra": {
-      "magento-deploy-ignore": [
-          "*.git*",
-          "*.md",
-          "composer.json",
-          "composer.lock"
-      ],
-      "magento-force": true,
-      "magento-root-dir": "./",
-      "magento-deploystrategy": "copy",
-      "map": [
-          ["app", "app"]
-      ]
-  },
-  "config": {
-      "allow-plugins": {
-          "magento-hackathon/magento-composer-installer": true
-      }
+    "map": [
+      ["app/code/local/Contestio", "app/code/local/Contestio"],
+      ["app/design/frontend/base/default/layout/contestio_connect.xml", "app/design/frontend/base/default/layout/contestio_connect.xml"],
+      ["app/design/frontend/base/default/template/contestio", "app/design/frontend/base/default/template/contestio"],
+      ["app/etc/modules/Contestio_Connect.xml", "app/etc/modules/Contestio_Connect.xml"]
+    ]
   }
 }
