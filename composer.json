@@ -1,50 +1,37 @@
 {
-    "name": "contestio/magento1",
-    "type": "magento-module",
-    "license": "proprietary",
-    "description":"Plugin Contestio pour Magento 1.x",
-    "version": "1.0.18",
-    "authors":[
-        {
-            "name":"Contestio",
-            "email":"contact@contestio.fr"
-        }
-    ],
-    "require": {
-        "magento-hackathon/magento-composer-installer": "^4.0"
-    },
-    "autoload": {
-      "files": [
-        "app/code/local/Contestio/Connect/Helper/Data.php",
-        "app/code/local/Contestio/Connect/Helper/Api.php"
-      ]
-    },
-    "extra": {
-      "map": [
-        ["app/code/local/Contestio/Connect/Helper/Data.php", "app/code/local/Contestio/Connect/Helper/Data.php"],
-        ["app/code/local/Contestio/Connect/Helper/Api.php", "app/code/local/Contestio/Connect/Helper/Api.php"],
-        ["app/design/frontend/base/default/layout/contestio_connect.xml", "app/design/frontend/base/default/layout/contestio_connect.xml"],
-        ["app/design/frontend/base/default/template/contestio/meta_tags.phtml", "app/design/frontend/base/default/template/contestio/meta_tags.phtml"],
-        ["app/design/frontend/base/default/template/contestio/react.phtml", "app/design/frontend/base/default/template/contestio/react.phtml"],
-        ["app/code/local/Contestio/Connect/etc/config.xml", "app/code/local/Contestio/Connect/etc/config.xml"],
-        ["app/code/local/Contestio/Connect/etc/system.xml", "app/code/local/Contestio/Connect/etc/system.xml"],
-        ["app/etc/modules/Contestio_Connect.xml", "app/etc/modules/Contestio_Connect.xml"],
-        ["app/code/local/Contestio/Connect/controllers/ApiController.php", "app/code/local/Contestio/Connect/controllers/ApiController.php"],
-        ["app/code/local/Contestio/Connect/controllers/ErrorController.php", "app/code/local/Contestio/Connect/controllers/ErrorController.php"],
-        ["app/code/local/Contestio/Connect/controllers/LoginController.php", "app/code/local/Contestio/Connect/controllers/LoginController.php"],
-        ["app/code/local/Contestio/Connect/controllers/ProfileController.php", "app/code/local/Contestio/Connect/controllers/ProfileController.php"],
-        ["app/code/local/Contestio/Connect/controllers/NewsController.php", "app/code/local/Contestio/Connect/controllers/NewsController.php"],
-        ["app/code/local/Contestio/Connect/controllers/IndexController.php", "app/code/local/Contestio/Connect/controllers/IndexController.php"],
-        ["app/code/local/Contestio/Connect/controllers/ContestsController.php", "app/code/local/Contestio/Connect/controllers/ContestsController.php"],
-        ["app/code/local/Contestio/Connect/controllers/SurveysController.php", "app/code/local/Contestio/Connect/controllers/SurveysController.php"],
-        ["app/code/local/Contestio/Connect/Model/Observer.php", "app/code/local/Contestio/Connect/Model/Observer.php"],
-        ["app/code/local/Contestio/Connect/Block/React.php", "app/code/local/Contestio/Connect/Block/React.php"]
-      ],
-      "magento-root-dir": "/"
-    },
-    "config": {
-        "allow-plugins": {
-            "magento-hackathon/magento-composer-installer": true
-        }
+  "name": "contestio/magento1",
+  "type": "magento-module",
+  "license": "proprietary",
+  "description":"Plugin Contestio pour Magento 1.x",
+  "version": "1.0.19",
+  "authors":[
+      {
+          "name":"Contestio",
+          "email":"contact@contestio.fr"
+      }
+  ],
+  "require": {
+      "magento-hackathon/magento-composer-installer": "^4.0"
+  },
+  "autoload": {
+    "psr-0": {
+      "Contestio_Connect": "app/code/local/"
     }
-}
+  },
+  "extra": {
+      "magento-deploy-ignore": [
+          "*.git*",
+          "*.md",
+          "composer.json",
+          "composer.lock"
+      ],
+      "magento-force": true,
+      "magento-root-dir": ".",
+      "with-bootstrap-patch": false
+  },
+  "config": {
+      "allow-plugins": {
+          "magento-hackathon/magento-composer-installer": true
+      }
+  }
+} 
