@@ -40,6 +40,9 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
             
             $headers = $this->getHeaders();
             $headers[] = 'clientuseragent: ' . $userAgent;
+            if ($this->customerId) {
+                $headers[] = 'externalid: ' . $this->customerId;
+            }
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
             if (!empty($data)) {

@@ -45,7 +45,8 @@
           <contestio_order_placed>
             <type>singleton</type>
             <class>Contestio_Connect_Model_Observer</class>
-            <method>orderPlaced</method>
+            <method>orderPlaced</method> 
+            <!-- onAfterOrderSave | sales_order_afterPlace -->
           </contestio_order_placed>
         </observers>
       </sales_order_place_after>
