@@ -2,8 +2,13 @@
 <layout version="0.1.0">
     <contestio_connect_index_index>
         <update handle="page_one_column"/>
+
+        <reference name="head">
+            <block type="contestio_connect/react" name="contestio_meta_tags" template="contestio/meta_tags.phtml" before="-" cacheable="false" />
+        </reference>
+
         <reference name="content">
-            <block type="contestio_connect/react" name="contestio_react" template="contestio/connect/react.phtml" />
+            <block type="contestio_connect/react" name="contestio_react" template="contestio/react.phtml" cacheable="false"  />
         </reference>
     </contestio_connect_index_index>
 

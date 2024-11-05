@@ -15,6 +15,7 @@
 !app/code/local/Contestio/**
 !composer.json
 !LICENSE
+!modman
 
 # Ignorer à nouveau tout le reste dans app
 app/*
@@ -41,8 +42,8 @@ app/design/frontend/base/default/etc/
 !app/design/frontend/base/default/layout/
 !app/design/frontend/base/default/layout/contestio_connect.xml
 !app/design/frontend/base/default/template/
-!app/design/frontend/base/default/template/connect.phtml
 !app/design/frontend/base/default/template/contestio/
-!app/design/frontend/base/default/template/contestio/**
+!app/design/frontend/base/default/template/contestio/react.phtml
+!app/design/frontend/base/default/template/contestio/meta_tags.phtml
 !app/etc/modules/
 !app/etc/modules/Contestio_Connect.xml

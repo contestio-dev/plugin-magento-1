@@ -16,11 +16,10 @@ class Contestio_Connect_Model_Observer
             $helper = Mage::helper('contestio_connect/api');
             $userAgent = Mage::helper('core/http')->getHttpUserAgent();
 
-            // Check if user is from Contestio
+            // Check if user is from the club
             $checkUser = $helper->callApi($userAgent, 'v1/users/final/me', "GET");
 
             if ($checkUser === false) {
-                Mage::log("Contestio: Impossible de vérifier l'utilisateur", null, 'contestio.log');
                 return;
             }
 
@@ -31,11 +30,7 @@ class Contestio_Connect_Model_Observer
             );
 
             // Send order to Contestio
-            $result = $helper->callApi($userAgent, 'v1/users/final/new-order', "POST", $orderData);
-            
-            if ($result === false) {
-                Mage::log("Contestio: Échec de l'envoi de la commande " . $order->getIncrementId(), null, 'contestio.log');
-            }
+            $helper->callApi($userAgent, 'v1/users/final/new-order', "POST", $orderData);
         } catch (Exception $e) {
             Mage::log("Contestio Observer Exception: " . $e->getMessage(), null, 'contestio.log');
         }

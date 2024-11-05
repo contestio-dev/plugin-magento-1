@@ -13,7 +13,6 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
         $this->apiSecret = Mage::getStoreConfig('contestio_connect/api_settings/api_secret');
         $this->customerId = Mage::getSingleton('customer/session')->getCustomer()->getId() ?? null;
         $this->baseUrl = "https://api.contestio.fr/";
-        // $this->baseUrl = "http://host.docker.internal:3000/";
     }
 
     private function getUrl($endpoint)
@@ -27,7 +26,6 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
             'Content-Type: ' . $contentType,
             'clientkey: ' . $this->apiKey,
             'clientsecret: ' . $this->apiSecret,
-            'externalId: ' . $this->customerId,
         ];
     }
 
@@ -64,7 +62,6 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
             throw new Exception($response, $httpCode);
             
         } catch (Exception $e) {
-            Mage::log("Contestio API Exception: " . $e->getMessage(), null, 'contestio.log');
             throw $e;
         }
     }
@@ -74,9 +71,13 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
         $ch = curl_init($this->getUrl($endpoint));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
-        
+
+
         $headers = $this->getHeaders('multipart/form-data');
         $headers[] = 'clientuseragent: ' . $userAgent;
+        if ($this->customerId) {
+            $headers[] = 'externalid: ' . $this->customerId;
+        }
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         $postFields = [

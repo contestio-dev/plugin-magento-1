@@ -1,37 +1,30 @@
 {
-    "name": "contestio/magento1",
-    "description": "Plugin Contestio pour Magento 1.9",
-    "version": "1.0.4",
-    "type": "magento-module",
-    "extra": {
-        "magento-root-dir": ".",
-        "map": [
-            ["app/code/local/Contestio/Connect", "app/code/local/Contestio/Connect"],
-            ["app/design/frontend/base/default/layout/contestio_connect.xml", "app/design/frontend/base/default/layout/contestio_connect.xml"],
-            ["app/design/frontend/base/default/template/contestio", "app/design/frontend/base/default/template/contestio"],
-            ["app/etc/modules/Contestio_Connect.xml", "app/etc/modules/Contestio_Connect.xml"]
-        ]
-    },
-    "require": {
-        "php": ">=7.0"
-    },
-    "license": "proprietary",
-    "authors": [
-        {
-            "name": "Contestio",
-            "email": "contact@contestio.fr"
-        }
-    ],
-    "minimum-stability": "stable",
-    "prefer-stable": true,
-    "autoload": {
-        "psr-0": {
-            "Contestio_Connect": "app/code/local/"
-        }
-    },
-    "config": {
-        "platform": {
-            "php": "7.0"
-        }
+  "name": "contestio/magento1",
+  "type": "magento-module",
+  "license": "proprietary",
+  "description": "Plugin Contestio pour Magento 1.x",
+  "version": "1.0.22",
+  "authors": [
+    {
+      "name": "Contestio",
+      "email": "contact@contestio.fr"
     }
+  ],
+  "require": {
+    "magento-hackathon/magento-composer-installer": "^3.0"
+  },
+  "autoload": {
+    "files": [
+      "app/code/local/Contestio/Connect/Helper/Data.php",
+      "app/code/local/Contestio/Connect/Helper/Api.php"
+    ]
+  },
+  "extra": {
+    "map": [
+      ["app/code/local/Contestio", "app/code/local/Contestio"],
+      ["app/design/frontend/base/default/layout/contestio_connect.xml", "app/design/frontend/base/default/layout/contestio_connect.xml"],
+      ["app/design/frontend/base/default/template/contestio", "app/design/frontend/base/default/template/contestio"],
+      ["app/etc/modules/Contestio_Connect.xml", "app/etc/modules/Contestio_Connect.xml"]
+    ]
+  }
 }
