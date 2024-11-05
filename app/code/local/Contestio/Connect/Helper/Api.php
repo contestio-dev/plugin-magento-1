@@ -33,26 +33,39 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
 
     public function callApi($userAgent, $endpoint, $method, $data = null)
     {
-        $ch = curl_init($this->getUrl($endpoint));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-        
-        $headers = $this->getHeaders();
-        $headers[] = 'clientuseragent: ' . $userAgent;
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        try {
+            $ch = curl_init($this->getUrl($endpoint));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 5); // Timeout après 5 secondes
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3); // Timeout de connexion après 3 secondes
+            
+            $headers = $this->getHeaders();
+            $headers[] = 'clientuseragent: ' . $userAgent;
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
-        if (!empty($data)) {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        }
+            if (!empty($data)) {
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+            }
 
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
+            curl_close($ch);
 
-        if ($httpCode >= 200 && $httpCode < 300) {
-            return json_decode($response, true);
-        } else {
+            if ($error) {
+                throw new Exception("Erreur CURL: " . $error);
+            }
+
+            if ($httpCode >= 200 && $httpCode < 300) {
+                return json_decode($response, true);
+            }
+            
             throw new Exception($response, $httpCode);
+            
+        } catch (Exception $e) {
+            Mage::log("Contestio API Exception: " . $e->getMessage(), null, 'contestio.log');
+            throw $e;
         }
     }
 
