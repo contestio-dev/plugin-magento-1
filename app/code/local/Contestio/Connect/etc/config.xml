@@ -40,16 +40,15 @@
     </blocks>
 
     <events>
-      <sales_order_place_after>
+      <sales_order_save_after>
         <observers>
           <contestio_order_placed>
             <type>singleton</type>
             <class>Contestio_Connect_Model_Observer</class>
-            <method>orderPlaced</method> 
-            <!-- onAfterOrderSave | sales_order_afterPlace -->
+            <method>onAfterOrderSave</method>
           </contestio_order_placed>
         </observers>
-      </sales_order_place_after>
+      </sales_order_save_after>
     </events>
   </global>
 

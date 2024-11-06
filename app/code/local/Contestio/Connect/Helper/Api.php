@@ -29,7 +29,7 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
         ];
     }
 
-    public function callApi($userAgent, $endpoint, $method, $data = null)
+    public function callApi($userAgent, $endpoint, $method, $data = null, $externalId = null)
     {
         try {
             $ch = curl_init($this->getUrl($endpoint));
@@ -40,9 +40,17 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
             
             $headers = $this->getHeaders();
             $headers[] = 'clientuseragent: ' . $userAgent;
+
+            // If external id is provided, use it (for order observer)
+            if ($externalId) {
+                $headers[] = 'externalid: ' . $externalId;
+            }
+
+            // Else, get user id from session
             if ($this->customerId) {
                 $headers[] = 'externalid: ' . $this->customerId;
             }
+
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
             if (!empty($data)) {
