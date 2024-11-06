@@ -1,7 +1,7 @@
 {
   "name": "contestio/magento1",
   "description": "Plugin Contestio pour Magento 1.9",
-  "version": "1.0.35",
+  "version": "1.0.36",
   "type": "magento-module",
   "license": "proprietary",
   "authors": [
@@ -22,6 +22,7 @@
     }
   },
   "extra": {
+    "magento-root-dir": ".",
     "map": [
       ["app/code/local/Contestio/Connect", "app/code/local/Contestio/Connect"],
       ["app/design/frontend/base/default/layout/contestio_connect.xml", "app/design/frontend/base/default/layout/contestio_connect.xml"],
