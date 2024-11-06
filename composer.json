@@ -3,7 +3,7 @@
   "type": "magento-module",
   "license": "proprietary",
   "description": "Plugin Contestio pour Magento 1.x",
-  "version": "1.0.26",
+  "version": "1.0.27",
   "authors": [
     {
       "name": "Contestio",
@@ -22,7 +22,7 @@
     ]
   },
   "extra": {
-    "magento-root-dir": "app/",
+    "magento-root-dir": "/",
     "map": [
       ["app/code/local/Contestio", "app/code/local/Contestio"],
       ["app/design/frontend/base/default/layout", "app/design/frontend/base/default/layout"],
