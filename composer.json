@@ -1,7 +1,7 @@
 {
   "name": "contestio/magento1",
   "description": "Plugin Contestio pour Magento 1.9",
-  "version": "1.0.36",
+  "version": "1.0.37",
   "type": "magento-module",
   "license": "proprietary",
   "authors": [
@@ -14,7 +14,7 @@
   "prefer-stable": true,
   "require": {
     "php": ">=7.0",
-    "magento-hackathon/magento-composer-installer": "^3.0"
+    "magento-hackathon/magento-composer-installer": "^4.0"
   },
   "autoload": {
     "psr-0": {
