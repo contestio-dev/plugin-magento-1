@@ -3,7 +3,7 @@
   "type": "magento-module",
   "license": "proprietary",
   "description": "Plugin Contestio pour Magento 1.x",
-  "version": "1.0.25",
+  "version": "1.0.26",
   "authors": [
     {
       "name": "Contestio",
@@ -29,5 +29,8 @@
       ["app/design/frontend/base/default/template/contestio", "app/design/frontend/base/default/template/contestio"],
       ["app/etc/modules/Contestio_Connect.xml", "app/etc/modules/Contestio_Connect.xml"]
     ]
+  },
+  "config": {
+    "preferred-install": "dist"
   }
 }
