@@ -1,26 +1,26 @@
 <?php
 class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
 {
-    public function preDispatch()
-    {
-        parent::preDispatch();
+    // public function preDispatch()
+    // {
+    //     parent::preDispatch();
         
-        $response = $this->getResponse();
-        $origin = $this->getRequest()->getHeader('Origin');
+    //     $response = $this->getResponse();
+    //     $origin = $this->getRequest()->getHeader('Origin');
         
-        if ($origin === 'http://127.0.0.1:3001' || $origin === 'http://localhost:3001') {
-            $response->setHeader('Access-Control-Allow-Origin', $origin);
-            $response->setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE, PATCH');
-            $response->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, clientkey, clientsecret, externalId, cache-control, pragma, expires');
-            $response->setHeader('Access-Control-Allow-Credentials', 'true');
-            $response->setHeader('Access-Control-Max-Age', '86400');
-        }
+    //     if ($origin === 'http://127.0.0.1:3001' || $origin === 'http://localhost:3001') {
+    //         $response->setHeader('Access-Control-Allow-Origin', $origin);
+    //         $response->setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE, PATCH');
+    //         $response->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, clientkey, clientsecret, externalId, cache-control, pragma, expires');
+    //         $response->setHeader('Access-Control-Allow-Credentials', 'true');
+    //         $response->setHeader('Access-Control-Max-Age', '86400');
+    //     }
 
-        if ($this->getRequest()->getMethod() == 'OPTIONS') {
-            $response->setHttpResponseCode(200)->sendResponse();
-            exit;
-        }
-    }
+    //     if ($this->getRequest()->getMethod() == 'OPTIONS') {
+    //         $response->setHttpResponseCode(200)->sendResponse();
+    //         exit;
+    //     }
+    // }
     public function proxyAction()
     {
         $helper = Mage::helper('contestio_connect/api');
@@ -90,6 +90,7 @@ class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
             'email' => $customer->getEmail(),
             'firstName' => $customer->getFirstname(),
             'lastName' => $customer->getLastname(),
+            'createdAt' => $customer->getCreatedAt(),
         ];
 
         return $response;
@@ -111,6 +112,8 @@ class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
                 'lname' => $userData['lastName'],
                 'pseudo' => $data['pseudo'],
                 'isFromContestio' => $data['isFromContestio'],
+                'createdAt' => $userData['createdAt'],
+                'currentTimestamp' => time(),
             ]
         ];
     }
