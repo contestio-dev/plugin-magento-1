@@ -17,7 +17,7 @@
             <show_in_store>1</show_in_store>
             <groups>
                 <api_settings translate="label">
-                    <label>Paramètres API</label>
+                    <label>Paramètres APIs</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>10</sort_order>
                     <show_in_default>1</show_in_default>
@@ -34,7 +34,7 @@
                         </api_key>
                         <api_secret translate="label">
                             <label>Secret API</label>
-                            <frontend_type>text</frontend_type>
+                            <frontend_type>password</frontend_type>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -42,6 +42,35 @@
                         </api_secret>
                     </fields>
                 </api_settings>
+
+                <api_settings_advanced translate="label" module="contestio_connect">
+                    <label>Avancé</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>20</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <base_url translate="label">
+                            <label>URL de l'API</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Default: https://api.contestio.fr</comment>
+                        </base_url>
+
+                        <base_url_react translate="label">
+                            <label>URL de l'application</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Default: https://d36h2ac42341sx.cloudfront.net</comment>
+                        </base_url_react>
+                    </fields>
+                </api_settings_advanced>
             </groups>
         </contestio_connect>
     </sections>

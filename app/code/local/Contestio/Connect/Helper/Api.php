@@ -12,12 +12,13 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
         $this->apiKey = Mage::getStoreConfig('contestio_connect/api_settings/api_key');
         $this->apiSecret = Mage::getStoreConfig('contestio_connect/api_settings/api_secret');
         $this->customerId = Mage::getSingleton('customer/session')->getCustomer()->getId() ?? null;
-        $this->baseUrl = "https://api.contestio.fr/";
     }
 
-    private function getUrl($endpoint)
+
+    private function getApiBaseUrl()
     {
-        return $this->baseUrl . $endpoint;
+        $baseUrl = Mage::getStoreConfig('contestio_connect/api_settings_advanced/base_url');
+        return $baseUrl ? $baseUrl : 'https://api.contestio.fr';
     }
 
     private function getHeaders($contentType = 'application/json')
@@ -25,14 +26,14 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
         return [
             'Content-Type: ' . $contentType,
             'clientkey: ' . $this->apiKey,
-            'clientsecret: ' . $this->apiSecret,
+            'clientsecret: ' . $this->apiSecret
         ];
     }
 
     public function callApi($userAgent, $endpoint, $method, $data = null, $externalId = null)
     {
         try {
-            $ch = curl_init($this->getUrl($endpoint));
+            $ch = curl_init($this->getApiBaseUrl() . '/' . $endpoint);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
             curl_setopt($ch, CURLOPT_TIMEOUT, 5); // Timeout après 5 secondes
@@ -79,7 +80,7 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
 
     public function uploadImage($userAgent, $endpoint, $file)
     {
-        $ch = curl_init($this->getUrl($endpoint));
+        $ch = curl_init($this->getApiBaseUrl() . $endpoint);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
 
