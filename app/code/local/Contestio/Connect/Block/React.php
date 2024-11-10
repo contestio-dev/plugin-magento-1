@@ -4,7 +4,7 @@ class Contestio_Connect_Block_React extends Mage_Core_Block_Template
     public function getReactAppUrl()
     {
         $baseUrl = Mage::getStoreConfig('contestio_connect/api_settings_advanced/base_url_react');
-        return $baseUrl ? $baseUrl : "https://d36h2ac42341sx.cloudfront.net";
+        return $baseUrl ? $baseUrl : "https://react.contestio.fr";
     }
 
     public function getMetaTags()

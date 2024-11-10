@@ -67,7 +67,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment>Default: https://d36h2ac42341sx.cloudfront.net</comment>
+                            <comment>Default: https://react.contestio.fr</comment>
                         </base_url_react>
                     </fields>
                 </api_settings_advanced>
