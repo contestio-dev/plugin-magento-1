@@ -80,18 +80,17 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
 
     public function uploadImage($userAgent, $endpoint, $file)
     {
-        $ch = curl_init($this->getApiBaseUrl() . $endpoint);
+        $ch = curl_init($this->getApiBaseUrl() . '/' . $endpoint);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
-
-
+        
         $headers = $this->getHeaders('multipart/form-data');
         $headers[] = 'clientuseragent: ' . $userAgent;
         if ($this->customerId) {
             $headers[] = 'externalid: ' . $this->customerId;
         }
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
+        
         $postFields = [
             'file' => new CURLFile($file['tmp_name'], $file['type'], $file['name'])
         ];
@@ -108,6 +107,7 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
             }
             return json_decode($response, true);
         } else {
+            return $response;
             throw new Exception($response, $httpCode);
         }
     }
