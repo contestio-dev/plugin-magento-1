@@ -45,10 +45,8 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
             // If external id is provided, use it (for order observer)
             if ($externalId) {
                 $headers[] = 'externalid: ' . $externalId;
-            }
-
-            // Else, get user id from session
-            if ($this->customerId) {
+            } else if ($this->customerId) {
+                // Else, get user id from session
                 $headers[] = 'externalid: ' . $this->customerId;
             }
 

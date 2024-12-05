@@ -25,9 +25,6 @@ class Contestio_Connect_ApiController extends Mage_Core_Controller_Front_Action
     {
         $helper = Mage::helper('contestio_connect/api');
 
-        $apiKey = Mage::getStoreConfig('contestio_connect/api_settings/api_key');
-        $apiSecret = Mage::getStoreConfig('contestio_connect/api_settings/api_secret');
-
         $endpoint = $this->getRequest()->getParam('endpoint');
         $method = $this->getRequest()->getMethod();
         $data = json_decode($this->getRequest()->getRawBody(), true);
