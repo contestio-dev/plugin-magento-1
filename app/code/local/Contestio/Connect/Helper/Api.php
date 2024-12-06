@@ -66,8 +66,18 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
             }
 
             if ($httpCode >= 200 && $httpCode < 300) {
+                if ($endpoint === 'v1/users/final/generate-token') {
+                    $response = json_decode($response, true);
+                    // Add apiurl to response
+                    $response['apiurl'] = $this->getApiBaseUrl();
+
+                    return $response;
+                }
+
+                // Else, return json decoded response
                 return json_decode($response, true);
             }
+
             
             throw new Exception($response, $httpCode);
             
