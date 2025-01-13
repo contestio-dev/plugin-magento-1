@@ -24,6 +24,7 @@ app/code/local/Contestio/Connect/controllers/NewsController.php app/code/local/C
 app/code/local/Contestio/Connect/controllers/IndexController.php app/code/local/Contestio/Connect/controllers/IndexController.php
 app/code/local/Contestio/Connect/controllers/ContestsController.php app/code/local/Contestio/Connect/controllers/ContestsController.php
 app/code/local/Contestio/Connect/controllers/SurveysController.php app/code/local/Contestio/Connect/controllers/SurveysController.php
+app/code/local/Contestio/Connect/controllers/PageController.php app/code/local/Contestio/Connect/controllers/PageController.php
 
 # Helpers
 app/code/local/Contestio/Connect/Helper/Data.php app/code/local/Contestio/Connect/Helper/Data.php
