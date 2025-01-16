@@ -31,4 +31,8 @@
     <contestio_connect_error_index>
         <update handle="contestio_connect_index_index"/>
     </contestio_connect_error_index>
+
+    <contestio_connect_page_index>
+        <update handle="contestio_connect_index_index"/>
+    </contestio_connect_page_index>
 </layout>
