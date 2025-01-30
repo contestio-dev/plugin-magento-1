@@ -17,7 +17,7 @@
             <show_in_store>1</show_in_store>
             <groups>
                 <api_settings translate="label">
-                    <label>Paramètres APIs</label>
+                    <label>Authentification</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>10</sort_order>
                     <show_in_default>1</show_in_default>
@@ -25,21 +25,21 @@
                     <show_in_store>1</show_in_store>
                     <fields>
                         <api_key translate="label">
-                            <label>Clé API</label>
+                            <label>Identifiant</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </api_key>
-                        <api_secret translate="label">
-                            <label>Secret API</label>
-                            <frontend_type>password</frontend_type>
+                        <access_token translate="label">
+                            <label>Jeton d'accès</label>
+                            <frontend_type>text</frontend_type>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                        </api_secret>
+                        </access_token>
                     </fields>
                 </api_settings>
 
@@ -60,15 +60,15 @@
                             <comment>Default: https://api.contestio.fr</comment>
                         </base_url>
 
-                        <base_url_react translate="label">
-                            <label>URL de l'application</label>
+                        <base_url_iframe translate="label">
+                            <label>URL de l'iframe</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment>Default: https://react.contestio.fr</comment>
-                        </base_url_react>
+                            <comment>Default: https://plugin.contestio.fr</comment>
+                        </base_url_iframe>
                     </fields>
                 </api_settings_advanced>
             </groups>

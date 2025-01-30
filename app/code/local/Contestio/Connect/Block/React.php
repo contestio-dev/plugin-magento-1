@@ -1,12 +1,6 @@
 <?php
 class Contestio_Connect_Block_React extends Mage_Core_Block_Template
 {
-    public function getReactAppUrl()
-    {
-        $baseUrl = Mage::getStoreConfig('contestio_connect/api_settings_advanced/base_url_react');
-        return $baseUrl ? $baseUrl : "https://react.contestio.fr";
-    }
-
     public function getMetaTags()
     {
         // Get current url
@@ -63,7 +57,7 @@ class Contestio_Connect_Block_React extends Mage_Core_Block_Template
         $customer = Mage::getSingleton('customer/session')->getCustomer();
         $customerId = $customer->getId();
         $customerEmail = $customer->getEmail();
-
+        
         $params = "";
 
         // Get l parameter from the current url

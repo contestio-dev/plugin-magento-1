@@ -139,7 +139,7 @@
                   ? window.location.href.split('?')[0] 
                   : window.location.href;
                 
-                const loginUrl = url.endsWith('/') ? url + 'login' : url + '/login';
+                const loginUrl = url.endsWith('/') ? url + 'login' : url + '/login/post';
                 logger.log('Attempting login to:', loginUrl);
   
                 const response = await fetch(loginUrl, {

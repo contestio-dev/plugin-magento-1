@@ -5,6 +5,9 @@ app/design/frontend/base/default/layout/contestio_connect.xml app/design/fronten
 app/design/frontend/base/default/template/contestio/meta_tags.phtml app/design/frontend/base/default/template/contestio/meta_tags.phtml
 app/design/frontend/base/default/template/contestio/react.phtml app/design/frontend/base/default/template/contestio/react.phtml
 
+# JS
+skin/frontend/base/default/js/contestio.js skin/frontend/base/default/js/contestio.js
+
 # Module activation XML
 app/etc/modules/Contestio_Connect.xml app/etc/modules/Contestio_Connect.xml
 
@@ -16,15 +19,9 @@ app/code/local/Contestio/Connect/etc/system.xml app/code/local/Contestio/Connect
 app/code/local/Contestio/Connect/Model/Observer.php app/code/local/Contestio/Connect/Model/Observer.php
 
 # Controllers
-app/code/local/Contestio/Connect/controllers/ApiController.php app/code/local/Contestio/Connect/controllers/ApiController.php
-app/code/local/Contestio/Connect/controllers/ErrorController.php app/code/local/Contestio/Connect/controllers/ErrorController.php
+app/code/local/Contestio/Connect/controllers/MeController.php app/code/local/Contestio/Connect/controllers/MeController.php
 app/code/local/Contestio/Connect/controllers/LoginController.php app/code/local/Contestio/Connect/controllers/LoginController.php
-app/code/local/Contestio/Connect/controllers/ProfileController.php app/code/local/Contestio/Connect/controllers/ProfileController.php
-app/code/local/Contestio/Connect/controllers/NewsController.php app/code/local/Contestio/Connect/controllers/NewsController.php
 app/code/local/Contestio/Connect/controllers/IndexController.php app/code/local/Contestio/Connect/controllers/IndexController.php
-app/code/local/Contestio/Connect/controllers/ContestsController.php app/code/local/Contestio/Connect/controllers/ContestsController.php
-app/code/local/Contestio/Connect/controllers/SurveysController.php app/code/local/Contestio/Connect/controllers/SurveysController.php
-app/code/local/Contestio/Connect/controllers/PageController.php app/code/local/Contestio/Connect/controllers/PageController.php
 
 # Helpers
 app/code/local/Contestio/Connect/Helper/Data.php app/code/local/Contestio/Connect/Helper/Data.php

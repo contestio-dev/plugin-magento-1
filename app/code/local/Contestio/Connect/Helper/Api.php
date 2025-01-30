@@ -2,18 +2,14 @@
 
 class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
 {
-    private $apiKey;
-    private $apiSecret;
-    private $customerId;
-    private $baseUrl;
+    private $shopName;
+    private $accessToken;
 
     public function __construct()
     {
-        $this->apiKey = Mage::getStoreConfig('contestio_connect/api_settings/api_key');
-        $this->apiSecret = Mage::getStoreConfig('contestio_connect/api_settings/api_secret');
-        $this->customerId = Mage::getSingleton('customer/session')->getCustomer()->getId() ?? null;
+        $this->shopName = Mage::getStoreConfig('contestio_connect/api_settings/api_key');
+        $this->accessToken = Mage::getStoreConfig('contestio_connect/api_settings/access_token');
     }
-
 
     private function getApiBaseUrl()
     {
@@ -21,38 +17,41 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
         return $baseUrl ? $baseUrl : 'https://api.contestio.fr';
     }
 
-    private function getHeaders($contentType = 'application/json')
-    {
-        return [
-            'Content-Type: ' . $contentType,
-            'clientkey: ' . $this->apiKey,
-            'clientsecret: ' . $this->apiSecret
-        ];
-    }
-
-    public function callApi($userAgent, $endpoint, $method, $data = null, $externalId = null)
+    public function callApi($userAgent, $endpoint, $method, $data = null, $externalId = null, $externalEmail = null)
     {
         try {
             $ch = curl_init($this->getApiBaseUrl() . '/' . $endpoint);
+
+            $headers = [
+                'Content-Type' => 'application/json',
+                'client-shop' => $this->shopName,
+                'clientuseragent' => $userAgent
+            ];
+
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
             curl_setopt($ch, CURLOPT_TIMEOUT, 5); // Timeout après 5 secondes
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3); // Timeout de connexion après 3 secondes
             
-            $headers = $this->getHeaders();
-            $headers[] = 'clientuseragent: ' . $userAgent;
-
-            // If external id is provided, use it (for order observer)
-            if ($externalId) {
-                $headers[] = 'externalid: ' . $externalId;
-            } else if ($this->customerId) {
-                // Else, get user id from session
-                $headers[] = 'externalid: ' . $this->customerId;
+            // Add customer id and email to headers
+            if (Mage::getSingleton('customer/session')->isLoggedIn()) {
+                $customer = Mage::getSingleton('customer/session')->getCustomer();
+                $helper = Mage::helper('contestio_connect/api');
+            
+                $headers['client-customer-id'] = $helper->encryptDataBase64(
+                    $externalId ?? $customer->getId(),
+                    $this->accessToken
+                );
+                $headers['client-customer-email'] = $helper->encryptDataBase64(
+                    $externalEmail ?? $customer->getEmail(),
+                    $this->accessToken
+                );
             }
 
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
-            if (!empty($data)) {
+            // Set data (used for POST - final user order observer)
+            if (!empty($data) && $method === 'POST') {
                 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
             }
 
@@ -66,57 +65,29 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
             }
 
             if ($httpCode >= 200 && $httpCode < 300) {
-                if ($endpoint === 'v1/users/final/generate-token') {
-                    $response = json_decode($response, true);
-                    // Add apiurl to response
-                    $response['apiurl'] = $this->getApiBaseUrl();
-
-                    return $response;
-                }
-
-                // Else, return json decoded response
                 return json_decode($response, true);
             }
-
             
             throw new Exception($response, $httpCode);
-            
         } catch (Exception $e) {
             throw $e;
         }
     }
 
-    public function uploadImage($userAgent, $endpoint, $file)
-    {
-        $ch = curl_init($this->getApiBaseUrl() . '/' . $endpoint);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        
-        $headers = $this->getHeaders('multipart/form-data');
-        $headers[] = 'clientuseragent: ' . $userAgent;
-        if ($this->customerId) {
-            $headers[] = 'externalid: ' . $this->customerId;
-        }
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        
-        $postFields = [
-            'file' => new CURLFile($file['tmp_name'], $file['type'], $file['name'])
-        ];
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+    public function encryptDataBase64($data, $accessToken) {
+        $method = 'AES-256-CBC';
 
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-        curl_close($ch);
-
-        if ($httpCode >= 200 && $httpCode < 300) {
-            if (strpos($contentType, 'image/webp') !== false) {
-                return base64_encode($response);
-            }
-            return json_decode($response, true);
-        } else {
-            return $response;
-            throw new Exception($response, $httpCode);
-        }
+        // Generate key and iv
+        $key = hash('sha256', $accessToken, true);
+        $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length($method));
+    
+        // Encrypt data
+        $encrypted = openssl_encrypt($data, $method, $key, 0, $iv);
+    
+        // Encode data and iv in Base64
+        return base64_encode(json_encode([
+            'iv' => base64_encode($iv),
+            'data' => $encrypted,
+        ]));
     }
 }
