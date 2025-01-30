@@ -5,34 +5,11 @@
 
         <reference name="head">
             <block type="contestio_connect/react" name="contestio_meta_tags" template="contestio/meta_tags.phtml" before="-" cacheable="false" />
+            <action method="addItem"><type>skin_js</type><name>js/contestio.js</name></action>
         </reference>
 
         <reference name="content">
             <block type="contestio_connect/react" name="contestio_react" template="contestio/react.phtml" cacheable="false"  />
         </reference>
     </contestio_connect_index_index>
-
-    <contestio_connect_contests_index>
-        <update handle="contestio_connect_index_index"/>
-    </contestio_connect_contests_index>
-
-    <contestio_connect_surveys_index>
-        <update handle="contestio_connect_index_index"/>
-    </contestio_connect_surveys_index>
-
-    <contestio_connect_profile_index>
-        <update handle="contestio_connect_index_index"/>
-    </contestio_connect_profile_index>
-
-    <contestio_connect_news_index>
-        <update handle="contestio_connect_index_index"/>
-    </contestio_connect_news_index>
-
-    <contestio_connect_error_index>
-        <update handle="contestio_connect_index_index"/>
-    </contestio_connect_error_index>
-
-    <contestio_connect_page_index>
-        <update handle="contestio_connect_index_index"/>
-    </contestio_connect_page_index>
 </layout>
