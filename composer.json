@@ -1,7 +1,7 @@
 {
   "name": "contestio/magento1",
   "description": "Plugin Contestio pour Magento 1.9",
-  "version": "1.0.44",
+  "version": "1.0.45",
   "type": "magento-module",
   "license": "proprietary",
   "authors": [
@@ -28,6 +28,7 @@
       ["app/design/frontend/base/default/layout/contestio_connect.xml", "app/design/frontend/base/default/layout/contestio_connect.xml"],
       ["app/design/frontend/base/default/template/contestio/meta_tags.phtml", "app/design/frontend/base/default/template/contestio/meta_tags.phtml"],
       ["app/design/frontend/base/default/template/contestio/react.phtml", "app/design/frontend/base/default/template/contestio/react.phtml"],
+      ["skin/frontend/base/default/js/contestio.js", "skin/frontend/base/default/js/contestio.js"],
       ["app/etc/modules/Contestio_Connect.xml", "app/etc/modules/Contestio_Connect.xml"]
     ]
   }
