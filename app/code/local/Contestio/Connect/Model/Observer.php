@@ -4,15 +4,17 @@ class Contestio_Connect_Model_Observer
     public function onAfterOrderSave(Varien_Event_Observer $observer)
     {        
         $order = $observer->getEvent()->getOrder();
+
+        $this->notifyApi($order);
         
-        // Check if order exists and is processing
-        if ($order && $order->getId() && $order->getState() == Mage_Sales_Model_Order::STATE_PROCESSING) {
-            // Avoid multiple calls if order is already processed
-            if (!$order->getData('contestio_notified')) {
-                $this->notifyApi($order);
-                $order->setData('contestio_notified', 1)->save();
-            }
-        }
+        // // Check if order exists and is processing
+        // if ($order && $order->getId() && $order->getState() == Mage_Sales_Model_Order::STATE_PROCESSING) {
+        //     // Avoid multiple calls if order is already processed
+        //     if (!$order->getData('contestio_notified')) {
+        //         $this->notifyApi($order);
+        //         $order->setData('contestio_notified', 1)->save();
+        //     }
+        // }
     }
 
     private function notifyApi($order)

@@ -20,40 +20,54 @@ class Contestio_Connect_Helper_Api extends Mage_Core_Helper_Abstract
     public function callApi($userAgent, $endpoint, $method, $data = null, $externalId = null, $externalEmail = null)
     {
         try {
+            $helper = Mage::helper('contestio_connect/api');
             $ch = curl_init($this->getApiBaseUrl() . '/' . $endpoint);
 
-            $headers = [
-                'Content-Type' => 'application/json',
-                'client-shop' => $this->shopName,
-                'clientuseragent' => $userAgent
-            ];
+            // Transformer le tableau de headers en format cURL
+            $headersArray = array(
+                'Content-Type: application/json',
+                'client-shop: ' . $this->shopName,
+                'clientuseragent: ' . $userAgent
+            );
+
+            // Add customer id and email to headers if logged in
+            if (Mage::getSingleton('customer/session')->isLoggedIn()) {
+                $customer = Mage::getSingleton('customer/session')->getCustomer();
+                
+                $headersArray[] = 'client-customer-id: ' . $helper->encryptDataBase64(
+                    $customer->getId(),
+                    $this->accessToken
+                );
+                $headersArray[] = 'client-customer-email: ' . $helper->encryptDataBase64(
+                    $customer->getEmail(),
+                    $this->accessToken
+                );
+            }
+
+            // Add external id and email to headers if provided (Order observer)
+            if ($externalId && $externalEmail) {
+                $headersArray[] = 'client-customer-id: ' . $helper->encryptDataBase64(
+                    $externalId,
+                    $this->accessToken
+                );
+                $headersArray[] = 'client-customer-email: ' . $helper->encryptDataBase64(
+                    $externalEmail,
+                    $this->accessToken
+                );
+            }
 
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
             curl_setopt($ch, CURLOPT_TIMEOUT, 5); // Timeout après 5 secondes
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3); // Timeout de connexion après 3 secondes
-            
-            // Add customer id and email to headers
-            if (Mage::getSingleton('customer/session')->isLoggedIn()) {
-                $customer = Mage::getSingleton('customer/session')->getCustomer();
-                $helper = Mage::helper('contestio_connect/api');
-            
-                $headers['client-customer-id'] = $helper->encryptDataBase64(
-                    $externalId ?? $customer->getId(),
-                    $this->accessToken
-                );
-                $headers['client-customer-email'] = $helper->encryptDataBase64(
-                    $externalEmail ?? $customer->getEmail(),
-                    $this->accessToken
-                );
-            }
-
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
             // Set data (used for POST - final user order observer)
             if (!empty($data) && $method === 'POST') {
                 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
             }
+
+            // Add headers
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headersArray);
 
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
