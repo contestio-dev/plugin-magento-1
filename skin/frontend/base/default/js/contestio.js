@@ -49,16 +49,15 @@
       }
     }
   
-    // Remplacer ces fonctions par une seule initialisation
     function init() {
-      // Au lieu de bloquer complètement la réinitialisation, on va la forcer si nécessaire
+      // Force the initialization if it's not already initialized
       if (window.contestioInitialized) {
-        // On vérifie si les éléments nécessaires sont présents
+        // Check if the necessary elements are present
         const container = document.querySelector('.contestio-container');
         const iframe = document.querySelector('.contestio-iframe');
         
         if (container && iframe) {
-          // Si les éléments sont présents, on force la réinitialisation
+          // If the elements are present, force the initialization
           logger.log('contestio.js - reinitializing');
           window.contestioInitialized = false;
         } else {
@@ -100,10 +99,10 @@
         containerElt.style.height = `${newHeight}px`;
       }
   
-      // Ajuster la hauteur immédiatement
+      // Adjust the height immediately
       adjustHeight();
   
-      // Ajuster la hauteur lors du redimensionnement
+      // Adjust the height when the window is resized
       window.addEventListener('resize', adjustHeight);
   
       // Function to create and configure the message listener
@@ -211,17 +210,17 @@
           }
         };
   
-        // Ajouter le listener
+        // Add the listener
         window.addEventListener('message', messageHandler);
   
-        // Retourner une fonction de cleanup
+        // Return a cleanup function
         return () => {
           logger.log('Cleaning up message listener');
           window.removeEventListener('message', messageHandler);
         };
       }
   
-      // Gérer le cycle de vie du listener
+      // Handle the listener lifecycle
       let cleanup = null;
   
       function setupListener() {
@@ -246,14 +245,14 @@
       });
     }
   
-    // Modifier la partie d'initialisation pour écouter aussi les changements de navigation
+    // Modify the initialization part to also listen to navigation changes
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);
     } else {
       init();
     }
   
-    // Ajouter un écouteur pour le changement de page avec History API
+    // Add a listener for page changes with the History API
     window.addEventListener('popstate', init);
   })();
   
