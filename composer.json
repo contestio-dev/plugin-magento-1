@@ -1,7 +1,7 @@
 {
   "name": "contestio/magento1",
   "description": "Plugin Contestio pour Magento 1.9",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "type": "magento-module",
   "license": "proprietary",
   "authors": [
