@@ -127,7 +127,8 @@
             loginCredentials,
             pathname,
             redirectUrl,
-            clipboardText
+            clipboardText,
+            cookie
           } = event.data;
   
           try {
