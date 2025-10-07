@@ -27,7 +27,7 @@
       constructor(iframe) {
         this.iframe = iframe;
         this.lastHeight = window.visualViewport?.height || window.innerHeight;
-  
+
         if (window.visualViewport) {
           window.visualViewport.addEventListener('resize', this.handleViewportResize.bind(this));
         }
@@ -47,6 +47,72 @@
         
         this.lastHeight = currentHeight;
       }
+    }
+
+    function getContestioIframe() {
+      return document.querySelector('.contestio-iframe');
+    }
+
+    function getIframeOrigin(iframe) {
+      if (!iframe) return null;
+
+      try {
+        return new URL(iframe.src).origin;
+      } catch (error) {
+        logger.warn('contestio.js - unable to determine iframe origin', error);
+        return null;
+      }
+    }
+
+    function getParentPathname() {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const l = urlParams.get('l');
+
+        if (!l || l === '/' || l === '') {
+          return '/';
+        }
+
+        return l.startsWith('/') ? l : '/' + l;
+      } catch (error) {
+        logger.warn('contestio.js - unable to read parent pathname', error);
+        return '/';
+      }
+    }
+
+    function sendNavigationUpdateToIframe(action = 'replace') {
+      const iframe = getContestioIframe();
+
+      if (!iframe || !iframe.contentWindow) {
+        logger.warn('contestio.js - iframe not ready for navigation sync');
+        return;
+      }
+
+      const iframeOrigin = getIframeOrigin(iframe);
+      if (!iframeOrigin) return;
+
+      const pathname = getParentPathname();
+
+      const message = {
+        type: 'parent-navigation',
+        action,
+        pathname,
+        title: document.title,
+        timestamp: Date.now()
+      };
+
+      try {
+        logger.log('Sending navigation sync to iframe:', message);
+        iframe.contentWindow.postMessage(message, iframeOrigin);
+      } catch (error) {
+        logger.error('Error sending navigation update to iframe:', error);
+      }
+    }
+
+    function handleParentPopstate() {
+      logger.log('contestio.js - popstate detected');
+      sendNavigationUpdateToIframe('popstate');
+      init();
     }
   
     function init() {
@@ -179,10 +245,71 @@
                   newUrl += (newUrl.includes('?') ? '&' : '?') + 'l=' + pathname;
                 }
   
-                logger.log('Update URL to:', newUrl);
-                history.pushState(null, null, newUrl);
+              logger.log('Update URL to:', newUrl);
+              history.pushState(null, null, newUrl);
+              sendNavigationUpdateToIframe('push');
+              break;
+                
+              case 'history-push':
+                const pushUrl = new URL(window.location.href);
+                pushUrl.search = '';
+                pushUrl.searchParams.delete('l');
+                pushUrl.searchParams.delete('u');
+
+                let newPushUrl = pushUrl.toString();
+                if (pathname !== '' && pathname !== '/') {
+                  newPushUrl += (newPushUrl.includes('?') ? '&' : '?') + 'l=' + pathname;
+                }
+
+              logger.log('History push to:', newPushUrl);
+              history.pushState({ title: event.data.title }, event.data.title || '', newPushUrl);
+              if (event.data.title) {
+                document.title = event.data.title;
+              }
+              sendNavigationUpdateToIframe('push');
+              break;
+
+              case 'history-replace':
+                const replaceUrl = new URL(window.location.href);
+                replaceUrl.search = '';
+                replaceUrl.searchParams.delete('l');
+                replaceUrl.searchParams.delete('u');
+
+                let newReplaceUrl = replaceUrl.toString();
+                if (pathname !== '' && pathname !== '/') {
+                  newReplaceUrl += (newReplaceUrl.includes('?') ? '&' : '?') + 'l=' + pathname;
+                }
+
+              logger.log('History replace to:', newReplaceUrl);
+              history.replaceState({ title: event.data.title }, event.data.title || '', newReplaceUrl);
+              if (event.data.title) {
+                document.title = event.data.title;
+              }
+              sendNavigationUpdateToIframe('replace');
+              break;
+
+              case 'history-back':
+                logger.log('History back');
+                if (window.history.length > 1) {
+                  history.back();
+                }
                 break;
-  
+
+              case 'request-parent-path':
+                logger.log('Iframe requested parent path sync');
+                if (!event.source || typeof event.source.postMessage !== 'function') {
+                  break;
+                }
+
+                event.source.postMessage({
+                  type: 'parent-navigation',
+                  action: 'sync',
+                  pathname: getParentPathname(),
+                  title: document.title,
+                  timestamp: Date.now()
+                }, iframeOrigin);
+                break;
+
               case 'redirect':
                 logger.log('Redirect to:', redirectUrl);
                 window.location.href = redirectUrl;
@@ -262,7 +389,7 @@
   
       // Set up the listener initially
       setupListener();
-  
+
       // Reconfigure the listener when the page becomes visible
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
@@ -270,8 +397,10 @@
           setupListener();
         }
       });
+
+      sendNavigationUpdateToIframe('init');
     }
-  
+
     // Modify the initialization part to also listen to navigation changes
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);
@@ -279,7 +408,7 @@
       init();
     }
   
-    // Add a listener for page changes with the History API
-    window.addEventListener('popstate', init);
+    // Synchronize iframe navigation when browser history changes
+    window.addEventListener('popstate', handleParentPopstate);
   })();
   
