@@ -5,12 +5,12 @@
   
     const verbose = false;
     
-    const logger = {
-      log: function(message, data) {
-        if (verbose) {
-          console.log('Contestio - ' + message, data ?? '');
-        }
-      },
+  const logger = {
+    log: function(message, data) {
+      if (verbose) {
+        console.log('Contestio - ' + message, data ?? '');
+      }
+    },
       warn: function(message, data) {
         if (verbose) {
           console.warn('Contestio - ' + message, data ?? '');
@@ -19,8 +19,53 @@
       error: function(message, data) {
         if (verbose) {
           console.error('Contestio - ' + message, data ?? '');
-        }
+    }
+  }
+
+  let iframeLoaded = false;
+  let pendingNavigationActions = [];
+  let navigationFlushTimeout = null;
+
+  function scheduleNavigationFlush(delay = 50) {
+    if (navigationFlushTimeout) {
+      return;
+    }
+
+    navigationFlushTimeout = setTimeout(() => {
+      navigationFlushTimeout = null;
+      if (iframeLoaded) {
+        flushPendingNavigationActions();
+      } else if (pendingNavigationActions.length) {
+        scheduleNavigationFlush(Math.min(delay * 2, 500));
       }
+    }, delay);
+  }
+
+  function queueNavigationAction(action) {
+    if (!pendingNavigationActions.includes(action)) {
+      pendingNavigationActions.push(action);
+      logger.log('contestio.js - queue navigation action', action);
+    }
+    scheduleNavigationFlush();
+  }
+
+  function flushPendingNavigationActions() {
+    if (!pendingNavigationActions.length) {
+      return;
+    }
+
+    if (navigationFlushTimeout) {
+      clearTimeout(navigationFlushTimeout);
+      navigationFlushTimeout = null;
+    }
+
+    const actions = pendingNavigationActions.slice();
+    pendingNavigationActions = [];
+
+    actions.forEach((action) => {
+      sendNavigationUpdateToIframe(action, true);
+    });
+  }
     }
   
     class KeyboardManager {
@@ -80,12 +125,18 @@
       }
     }
 
-    function sendNavigationUpdateToIframe(action = 'replace') {
-      const iframe = getContestioIframe();
+    function sendNavigationUpdateToIframe(action = 'replace', force = false) {
+    const iframe = getContestioIframe();
 
-      if (!iframe || !iframe.contentWindow) {
-        logger.warn('contestio.js - iframe not ready for navigation sync');
-        return;
+    if (!iframe || !iframe.contentWindow) {
+      logger.warn('contestio.js - iframe not ready for navigation sync');
+      queueNavigationAction(action);
+      return;
+    }
+
+    if (!iframeLoaded && !force) {
+      queueNavigationAction(action);
+      return;
       }
 
       const iframeOrigin = getIframeOrigin(iframe);
@@ -101,18 +152,21 @@
         timestamp: Date.now()
       };
 
-      try {
-        logger.log('Sending navigation sync to iframe:', message);
-        iframe.contentWindow.postMessage(message, iframeOrigin);
-      } catch (error) {
-        logger.error('Error sending navigation update to iframe:', error);
-      }
+    try {
+      logger.log('Sending navigation sync to iframe:', message);
+      iframe.contentWindow.postMessage(message, iframeOrigin);
+      iframeLoaded = true;
+      iframe.dataset.contestioIframeLoaded = 'true';
+    } catch (error) {
+      logger.error('Error sending navigation update to iframe:', error);
+      queueNavigationAction(action);
+      scheduleNavigationFlush(100);
     }
+  }
 
     function handleParentPopstate() {
       logger.log('contestio.js - popstate detected');
       sendNavigationUpdateToIframe('popstate');
-      init();
     }
   
     function init() {
@@ -138,12 +192,40 @@
       const iframe = document.querySelector('.contestio-iframe');
   
       if (!container || !iframe) {
-        logger.warn('contestio.js - container or iframe not found');
-        return;
+      logger.warn('contestio.js - container or iframe not found');
+      return;
+    }
+
+    if (iframe.dataset.contestioIframeLoaded === 'true') {
+      iframeLoaded = true;
+    }
+
+    if (!iframe.dataset.contestioLoadListenerAttached) {
+      iframe.addEventListener('load', () => {
+        iframeLoaded = true;
+        iframe.dataset.contestioIframeLoaded = 'true';
+        logger.log('contestio.js - iframe load detected, flushing queue');
+        flushPendingNavigationActions();
+      });
+      iframe.dataset.contestioLoadListenerAttached = 'true';
+    }
+
+    if (!iframeLoaded) {
+      try {
+        const href = iframe.contentWindow && iframe.contentWindow.location && iframe.contentWindow.location.href;
+        if (href && href !== 'about:blank') {
+          // Same-origin blank document, wait for remote load.
+        }
+      } catch (error) {
+        iframeLoaded = true;
+        iframe.dataset.contestioIframeLoaded = 'true';
+        logger.log('contestio.js - iframe already loaded, flushing queue');
+        flushPendingNavigationActions();
       }
-  
-      // Initialize keyboard manager
-      new KeyboardManager(iframe);
+    }
+
+    // Initialize keyboard manager
+    new KeyboardManager(iframe);
   
       function adjustHeight() {
         const mainContentElt = document.querySelector('.main-container');
@@ -297,17 +379,7 @@
 
               case 'request-parent-path':
                 logger.log('Iframe requested parent path sync');
-                if (!event.source || typeof event.source.postMessage !== 'function') {
-                  break;
-                }
-
-                event.source.postMessage({
-                  type: 'parent-navigation',
-                  action: 'sync',
-                  pathname: getParentPathname(),
-                  title: document.title,
-                  timestamp: Date.now()
-                }, iframeOrigin);
+                sendNavigationUpdateToIframe('sync');
                 break;
 
               case 'redirect':
