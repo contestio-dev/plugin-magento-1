@@ -1,7 +1,7 @@
 (function () {
     'use strict';
   
-    if (window.__contestioMagento1ScriptActive) {
+  if (window.__contestioMagento1ScriptActive) {
       console.log('contestio.js already initialised, skipping duplicate execution');
       return;
     }
@@ -125,7 +125,7 @@
       notifyAfterAck: Boolean(notifyAfterAck),
     };
 
-    logger.log('contestio.js - awaiting ack-path', awaitingAck);
+    // awaiting ack-path (verbose log removed)
     clearAwaitingAckTimeout();
 
     if (lastAckPath && lastAckPath === normalized) {
@@ -160,7 +160,7 @@
     awaitingAck = null;
     clearAwaitingAckTimeout();
 
-    logger.log('contestio.js - ack-path resolved', pending);
+    // ack-path resolved (verbose log removed)
 
     if (pending.notifyAfterAck) {
       sendNavigationUpdateToIframe(pending.action || 'replace', {
@@ -173,10 +173,7 @@
   function handleAckFromIframe(pathname) {
     const normalized = normalizePathValue(pathname);
     lastAckPath = normalized;
-    logger.log('contestio.js - handle ack-path', {
-      normalized,
-      awaitingAck,
-    });
+    // handle ack-path (verbose log removed)
 
     if (awaitingAck && awaitingAck.path === normalized) {
       completeAwaitingAck();
@@ -280,14 +277,7 @@
       };
 
       try {
-      logger.log('contestio.js - send navigation update', {
-        action,
-        pathname,
-        trackAck,
-        notifyAfterAck,
-        skipAckTracking,
-        force,
-      });
+      // send navigation update (verbose log removed)
       iframe.contentWindow.postMessage(message, iframeOrigin);
       iframeLoaded = true;
       iframe.dataset.contestioIframeLoaded = 'true';
@@ -306,7 +296,6 @@
   }
 
   function handleParentPopstate() {
-    logger.log('contestio.js - popstate detected');
     sendNavigationUpdateToIframe('popstate', {
       trackAck: true,
       notifyAfterAck: false,
@@ -509,7 +498,6 @@
           newPushUrl += (newPushUrl.includes('?') ? '&' : '?') + 'l=' + pathname;
         }
 
-        logger.log('History push to:', newPushUrl);
         if (window.location.href !== newPushUrl) {
           history.pushState({ title: event.data.title }, event.data.title || '', newPushUrl);
           if (event.data.title) {
@@ -558,10 +546,7 @@
               case 'ack-path':
                 {
                   const ackPath = pathname || event.data.fullPath || '/';
-                  logger.log('contestio.js - ack-path message received', {
-                    ackPath,
-                    raw: event.data,
-                  });
+              // ack-path message received (verbose log removed)
                   handleAckFromIframe(ackPath);
                 }
                 break;
