@@ -1,95 +1,270 @@
 (function () {
     'use strict';
   
+  if (window.__contestioMagento1ScriptActive) {
+      console.log('contestio.js already initialised, skipping duplicate execution');
+      return;
+    }
+    window.__contestioMagento1ScriptActive = true;
+
     console.log('contestio.js loaded');
   
-    const verbose = false;
-    
-    const logger = {
-      log: function(message, data) {
-        if (verbose) {
-          console.log('Contestio - ' + message, data ?? '');
-        }
-      },
-      warn: function(message, data) {
-        if (verbose) {
-          console.warn('Contestio - ' + message, data ?? '');
-        }
-      },
-      error: function(message, data) {
-        if (verbose) {
-          console.error('Contestio - ' + message, data ?? '');
-        }
-      }
+  const logger = {
+    log: function(message, data) {
+      console.log('Contestio - ' + message, data ?? '');
+    },
+    warn: function(message, data) {
+      console.warn('Contestio - ' + message, data ?? '');
+    },
+    error: function(message, data) {
+      console.error('Contestio - ' + message, data ?? '');
     }
-  
-    class KeyboardManager {
-      constructor(iframe) {
-        this.iframe = iframe;
-        this.lastHeight = window.visualViewport?.height || window.innerHeight;
+  };
 
-        if (window.visualViewport) {
-          window.visualViewport.addEventListener('resize', this.handleViewportResize.bind(this));
-        }
+  let iframeLoaded = false;
+  let pendingNavigationActions = [];
+  let navigationFlushTimeout = null;
+  let awaitingAck = null;
+  let awaitingAckTimeout = null;
+  const ACK_TIMEOUT_MS = 2000;
+  let lastAckPath = null;
+  const allowedIframeOrigins = new Set();
+
+  if (typeof window !== "undefined" && window.location && window.location.origin) {
+    allowedIframeOrigins.add(window.location.origin);
+  }
+
+  window.__contestioAllowedOrigins = allowedIframeOrigins;
+
+  function scheduleNavigationFlush(delay = 50) {
+    if (navigationFlushTimeout) {
+      return;
+    }
+
+    navigationFlushTimeout = setTimeout(() => {
+      navigationFlushTimeout = null;
+      if (iframeLoaded) {
+        flushPendingNavigationActions();
+      } else if (pendingNavigationActions.length) {
+        scheduleNavigationFlush(Math.min(delay * 2, 500));
       }
-  
-      handleViewportResize(event) {
-        const currentHeight = window.visualViewport.height;
-        const heightDiff = Math.abs(this.lastHeight - currentHeight);
-        
-        // Scroll to the top if the height change
-        if (heightDiff > 20 && currentHeight > this.lastHeight) {
-          window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
+    }, delay);
+  }
+
+  function normalizePathValue(pathname) {
+    if (!pathname || pathname === '/' || pathname === '') {
+      return '/';
+    }
+
+    return pathname.startsWith('/') ? pathname : '/' + pathname;
+  }
+
+  function normalizeOrigin(url) {
+    if (!url) return null;
+    try {
+      const origin = new URL(url).origin;
+      if (origin && origin !== 'null') {
+        return origin;
+      }
+    } catch (error) {
+      logger.warn('contestio.js - unable to normalize origin from url', url, error);
+    }
+    return null;
+  }
+
+  function queueNavigationAction(action, options = {}) {
+    if (
+      !pendingNavigationActions.some(
+        (item) =>
+          item.action === action &&
+          JSON.stringify(item.options) === JSON.stringify(options)
+      )
+    ) {
+      pendingNavigationActions.push({ action, options });
+      logger.log('contestio.js - queue navigation action', {
+        action,
+        options,
+        queueLength: pendingNavigationActions.length,
+      });
+    }
+    scheduleNavigationFlush();
+  }
+
+  function flushPendingNavigationActions() {
+    if (!pendingNavigationActions.length) {
+      logger.log('contestio.js - flush skip (queue empty)');
+      return;
+    }
+
+    if (navigationFlushTimeout) {
+      clearTimeout(navigationFlushTimeout);
+      navigationFlushTimeout = null;
+    }
+
+    const actions = pendingNavigationActions.slice();
+    pendingNavigationActions = [];
+
+    actions.forEach(({ action, options }) => {
+      logger.log('contestio.js - flush action', { action, options });
+      sendNavigationUpdateToIframe(action, { ...options, force: true });
+    });
+  }
+
+  function clearAwaitingAckTimeout() {
+    if (awaitingAckTimeout) {
+      clearTimeout(awaitingAckTimeout);
+      awaitingAckTimeout = null;
+    }
+  }
+
+  function setAwaitingAck(pathname, action, notifyAfterAck) {
+    const normalized = normalizePathValue(pathname);
+    awaitingAck = {
+      path: normalized,
+      action,
+      notifyAfterAck: Boolean(notifyAfterAck),
+    };
+
+    // awaiting ack-path (verbose log removed)
+    clearAwaitingAckTimeout();
+
+    if (lastAckPath && lastAckPath === normalized) {
+      completeAwaitingAck();
+      return;
+    }
+
+    if (awaitingAck) {
+      awaitingAckTimeout = setTimeout(() => {
+        logger.warn('contestio.js - ack timeout, forcing completion', {
+          awaitingAck,
+        });
+        const pending = awaitingAck;
+        awaitingAck = null;
+        awaitingAckTimeout = null;
+        if (pending && pending.action) {
+          sendNavigationUpdateToIframe(pending.action, {
+            force: true,
+            skipAckTracking: true,
           });
         }
-        
-        this.lastHeight = currentHeight;
+      }, ACK_TIMEOUT_MS);
+    }
+  }
+
+  function completeAwaitingAck() {
+    if (!awaitingAck) {
+      return;
+    }
+
+    const pending = awaitingAck;
+    awaitingAck = null;
+    clearAwaitingAckTimeout();
+
+    // ack-path resolved (verbose log removed)
+
+    if (pending.notifyAfterAck) {
+      sendNavigationUpdateToIframe(pending.action || 'replace', {
+        force: true,
+        skipAckTracking: true,
+      });
+    }
+  }
+
+  function handleAckFromIframe(pathname) {
+    const normalized = normalizePathValue(pathname);
+    lastAckPath = normalized;
+    // handle ack-path (verbose log removed)
+
+    if (awaitingAck && awaitingAck.path === normalized) {
+      completeAwaitingAck();
+    }
+  }
+
+  class KeyboardManager {
+    constructor(iframe) {
+      this.iframe = iframe;
+      this.lastHeight = window.visualViewport?.height || window.innerHeight;
+
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', this.handleViewportResize.bind(this));
       }
     }
 
-    function getContestioIframe() {
-      return document.querySelector('.contestio-iframe');
-    }
+    handleViewportResize(event) {
+      const currentHeight = window.visualViewport.height;
+      const heightDiff = Math.abs(this.lastHeight - currentHeight);
 
-    function getIframeOrigin(iframe) {
-      if (!iframe) return null;
-
-      try {
-        return new URL(iframe.src).origin;
-      } catch (error) {
-        logger.warn('contestio.js - unable to determine iframe origin', error);
-        return null;
+      // Scroll to the top if the height change
+      if (heightDiff > 20 && currentHeight > this.lastHeight) {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
       }
+
+      this.lastHeight = currentHeight;
     }
 
-    function getParentPathname() {
-      try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const l = urlParams.get('l');
+  }
 
-        if (!l || l === '/' || l === '') {
-          return '/';
-        }
+  function getContestioIframe() {
+    return document.querySelector('.contestio-iframe');
+  }
 
-        return l.startsWith('/') ? l : '/' + l;
-      } catch (error) {
-        logger.warn('contestio.js - unable to read parent pathname', error);
+  function getIframeOrigin(iframe) {
+    if (!iframe) return null;
+
+    return normalizeOrigin(iframe.src);
+  }
+
+  function getParentPathname() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const l = urlParams.get('l');
+
+      if (!l || l === '/' || l === '') {
         return '/';
       }
+
+      return l.startsWith('/') ? l : '/' + l;
+    } catch (error) {
+      logger.warn('contestio.js - unable to read parent pathname', error);
+      return '/';
+    }
+  }
+
+    function sendNavigationUpdateToIframe(action = 'replace', options = {}) {
+    const {
+      force = false,
+      trackAck = false,
+      notifyAfterAck = false,
+      skipAckTracking = false,
+    } = options;
+
+    const iframe = getContestioIframe();
+
+    if (!iframe || !iframe.contentWindow) {
+      logger.warn('contestio.js - iframe not ready for navigation sync');
+      queueNavigationAction(action, {
+        trackAck: trackAck && !skipAckTracking,
+        notifyAfterAck,
+        skipAckTracking,
+      });
+      return;
     }
 
-    function sendNavigationUpdateToIframe(action = 'replace') {
-      const iframe = getContestioIframe();
+    if (!iframeLoaded && !force) {
+      queueNavigationAction(action, {
+        trackAck: trackAck && !skipAckTracking,
+        notifyAfterAck,
+        skipAckTracking,
+      });
+      return;
+    }
 
-      if (!iframe || !iframe.contentWindow) {
-        logger.warn('contestio.js - iframe not ready for navigation sync');
-        return;
-      }
-
-      const iframeOrigin = getIframeOrigin(iframe);
-      if (!iframeOrigin) return;
+    const iframeOrigin = getIframeOrigin(iframe);
+    if (!iframeOrigin) return;
+    allowedIframeOrigins.add(iframeOrigin);
 
       const pathname = getParentPathname();
 
@@ -102,18 +277,30 @@
       };
 
       try {
-        logger.log('Sending navigation sync to iframe:', message);
-        iframe.contentWindow.postMessage(message, iframeOrigin);
-      } catch (error) {
-        logger.error('Error sending navigation update to iframe:', error);
+      // send navigation update (verbose log removed)
+      iframe.contentWindow.postMessage(message, iframeOrigin);
+      iframeLoaded = true;
+      iframe.dataset.contestioIframeLoaded = 'true';
+      if (trackAck && !skipAckTracking) {
+        setAwaitingAck(pathname, action, notifyAfterAck);
       }
+    } catch (error) {
+      logger.error('Error sending navigation update to iframe:', error);
+      queueNavigationAction(action, {
+        trackAck: trackAck && !skipAckTracking,
+        notifyAfterAck,
+        skipAckTracking,
+      });
+      scheduleNavigationFlush(100);
     }
+  }
 
-    function handleParentPopstate() {
-      logger.log('contestio.js - popstate detected');
-      sendNavigationUpdateToIframe('popstate');
-      init();
-    }
+  function handleParentPopstate() {
+    sendNavigationUpdateToIframe('popstate', {
+      trackAck: true,
+      notifyAfterAck: false,
+    });
+  }
   
     function init() {
       // Force the initialization if it's not already initialized
@@ -138,12 +325,40 @@
       const iframe = document.querySelector('.contestio-iframe');
   
       if (!container || !iframe) {
-        logger.warn('contestio.js - container or iframe not found');
-        return;
+      logger.warn('contestio.js - container or iframe not found');
+      return;
+    }
+
+    if (iframe.dataset.contestioIframeLoaded === 'true') {
+      iframeLoaded = true;
+    }
+
+    if (!iframe.dataset.contestioLoadListenerAttached) {
+      iframe.addEventListener('load', () => {
+        iframeLoaded = true;
+        iframe.dataset.contestioIframeLoaded = 'true';
+        logger.log('contestio.js - iframe load detected, flushing queue');
+        flushPendingNavigationActions();
+      });
+      iframe.dataset.contestioLoadListenerAttached = 'true';
+    }
+
+    if (!iframeLoaded) {
+      try {
+        const href = iframe.contentWindow && iframe.contentWindow.location && iframe.contentWindow.location.href;
+        if (href && href !== 'about:blank') {
+          // Same-origin blank document, wait for remote load.
+        }
+      } catch (error) {
+        iframeLoaded = true;
+        iframe.dataset.contestioIframeLoaded = 'true';
+        logger.log('contestio.js - iframe already loaded, flushing queue');
+        flushPendingNavigationActions();
       }
-  
-      // Initialize keyboard manager
-      new KeyboardManager(iframe);
+    }
+
+    // Initialize keyboard manager
+    new KeyboardManager(iframe);
   
       function adjustHeight() {
         const mainContentElt = document.querySelector('.main-container');
@@ -176,18 +391,40 @@
         const messageHandler = async (event) => {
           const iframeElt = document.querySelector('.contestio-iframe');
           // Strict security check
-          const iframeOrigin = new URL(iframeElt.src).origin;
-          if (!event.origin || event.origin !== iframeOrigin) {
-            logger.warn('Message received from unauthorized origin:', event.origin);
+          const iframeOrigin = normalizeOrigin(iframeElt.src);
+          const baseOrigin = normalizeOrigin(iframeElt?.dataset?.contestioBaseUrl);
+          if (baseOrigin) {
+            allowedIframeOrigins.add(baseOrigin);
+          }
+          if (iframeOrigin) {
+            allowedIframeOrigins.add(iframeOrigin);
+          }
+
+          if (!event.origin) {
             return;
           }
-  
+
+          if (!allowedIframeOrigins.has(event.origin)) {
+            logger.log('Message received from unauthorized origin:', event.origin, {
+              allowed: Array.from(allowedIframeOrigins.values()),
+            });
+            return;
+          }
+
           // Check that event.data exists and is an object
-          if (!event.data || typeof event.data !== 'object') {
-            logger.warn('Invalid message received:', event.data);
+          if (!event.data || typeof event.data !== 'object' || !event.data.type) {
             return;
           }
-  
+
+          const replyOrigin =
+            event.origin ||
+            normalizeOrigin(iframeElt.src) ||
+            normalizeOrigin(iframeElt.dataset?.contestioBaseUrl);
+          if (!replyOrigin) {
+            logger.warn('contestio.js - unable to determine reply origin', event);
+            return;
+          }
+
           const {
             type,
             loginCredentials,
@@ -230,63 +467,67 @@
                       message: data.message,
                       data: data
                     }
-                  }, iframeOrigin);
+                  }, replyOrigin);
                 }
                 break;
   
               case 'pathname':
                 const currentUrl = new URL(window.location.href);
-                currentUrl.search = '';
                 currentUrl.searchParams.delete('l');
                 currentUrl.searchParams.delete('u');
-  
-                let newUrl = currentUrl.toString();
+
                 if (pathname !== '' && pathname !== '/') {
-                  newUrl += (newUrl.includes('?') ? '&' : '?') + 'l=' + pathname;
+                  currentUrl.searchParams.set('l', pathname);
+                } else {
+                  currentUrl.searchParams.delete('l');
                 }
-  
-              logger.log('Update URL to:', newUrl);
-              history.pushState(null, null, newUrl);
+
+              history.pushState(null, null, currentUrl.toString());
               sendNavigationUpdateToIframe('push');
               break;
                 
               case 'history-push':
-                const pushUrl = new URL(window.location.href);
-                pushUrl.search = '';
-                pushUrl.searchParams.delete('l');
-                pushUrl.searchParams.delete('u');
+        const pushUrl = new URL(window.location.href);
+        pushUrl.searchParams.delete('l');
+        pushUrl.searchParams.delete('u');
 
-                let newPushUrl = pushUrl.toString();
-                if (pathname !== '' && pathname !== '/') {
-                  newPushUrl += (newPushUrl.includes('?') ? '&' : '?') + 'l=' + pathname;
-                }
+        if (pathname !== '' && pathname !== '/') {
+          pushUrl.searchParams.set('l', pathname);
+        } else {
+          pushUrl.searchParams.delete('l');
+        }
 
-              logger.log('History push to:', newPushUrl);
-              history.pushState({ title: event.data.title }, event.data.title || '', newPushUrl);
-              if (event.data.title) {
-                document.title = event.data.title;
-              }
-              sendNavigationUpdateToIframe('push');
-              break;
+        const newPushUrl = pushUrl.toString();
 
-              case 'history-replace':
-                const replaceUrl = new URL(window.location.href);
-                replaceUrl.search = '';
-                replaceUrl.searchParams.delete('l');
-                replaceUrl.searchParams.delete('u');
+        if (window.location.href !== newPushUrl) {
+          history.pushState({ title: event.data.title }, event.data.title || '', newPushUrl);
+          if (event.data.title) {
+            document.title = event.data.title;
+          }
+          sendNavigationUpdateToIframe('push');
+        }
+        break;
 
-                let newReplaceUrl = replaceUrl.toString();
-                if (pathname !== '' && pathname !== '/') {
-                  newReplaceUrl += (newReplaceUrl.includes('?') ? '&' : '?') + 'l=' + pathname;
-                }
+      case 'history-replace':
+        const replaceUrl = new URL(window.location.href);
+        replaceUrl.searchParams.delete('l');
+        replaceUrl.searchParams.delete('u');
 
-              logger.log('History replace to:', newReplaceUrl);
-              history.replaceState({ title: event.data.title }, event.data.title || '', newReplaceUrl);
-              if (event.data.title) {
-                document.title = event.data.title;
-              }
-              sendNavigationUpdateToIframe('replace');
-              break;
+        if (pathname !== '' && pathname !== '/') {
+          replaceUrl.searchParams.set('l', pathname);
+        } else {
+          replaceUrl.searchParams.delete('l');
+        }
+
+        const newReplaceUrl = replaceUrl.toString();
+        if (window.location.href !== newReplaceUrl) {
+          history.replaceState({ title: event.data.title }, event.data.title || '', newReplaceUrl);
+          if (event.data.title) {
+            document.title = event.data.title;
+          }
+          sendNavigationUpdateToIframe('replace');
+        }
+        break;
 
               case 'history-back':
                 logger.log('History back');
@@ -297,17 +538,18 @@
 
               case 'request-parent-path':
                 logger.log('Iframe requested parent path sync');
-                if (!event.source || typeof event.source.postMessage !== 'function') {
-                  break;
-                }
+                sendNavigationUpdateToIframe('sync', {
+                  trackAck: true,
+                  notifyAfterAck: false,
+                });
+                break;
 
-                event.source.postMessage({
-                  type: 'parent-navigation',
-                  action: 'sync',
-                  pathname: getParentPathname(),
-                  title: document.title,
-                  timestamp: Date.now()
-                }, iframeOrigin);
+              case 'ack-path':
+                {
+                  const ackPath = pathname || event.data.fullPath || '/';
+              // ack-path message received (verbose log removed)
+                  handleAckFromIframe(ackPath);
+                }
                 break;
 
               case 'redirect':
@@ -337,7 +579,7 @@
                     cookieName: cookie.name,
                     cookieValue: cookieValue
                   }
-                }, iframeOrigin);
+                }, replyOrigin);
                 break;
   
               case 'deleteCookie':
@@ -359,25 +601,31 @@
                   message: "Erreur lors du traitement de la requête",
                   error: error.message
                 }
-              }, iframeOrigin);
+              }, replyOrigin);
             }
           }
         };
-  
+
         // Add the listener
         window.addEventListener('message', messageHandler);
-  
+
         // Return a cleanup function
         return () => {
           logger.log('Cleaning up message listener');
           window.removeEventListener('message', messageHandler);
+          window.__contestioMessageListenerActive = false;
         };
       }
-  
+
       // Handle the listener lifecycle
-      let cleanup = null;
-  
+      let cleanup = window.__contestioMessageListenerCleanup || null;
+      window.__contestioMessageListenerActive = window.__contestioMessageListenerActive || false;
+
       function setupListener() {
+        if (window.__contestioMessageListenerActive) {
+          logger.log('contestio.js - message listener already active, skipping setup');
+          return;
+        }
         logger.log('Setting up message listener');
         // Clean up old listener if it exists
         if (cleanup) {
@@ -385,8 +633,10 @@
         }
         // Create a new listener
         cleanup = createMessageListener();
+        window.__contestioMessageListenerCleanup = cleanup;
+        window.__contestioMessageListenerActive = true;
       }
-  
+
       // Set up the listener initially
       setupListener();
 
@@ -398,7 +648,10 @@
         }
       });
 
-      sendNavigationUpdateToIframe('init');
+      sendNavigationUpdateToIframe('init', {
+        trackAck: true,
+        notifyAfterAck: false,
+      });
     }
 
     // Modify the initialization part to also listen to navigation changes
