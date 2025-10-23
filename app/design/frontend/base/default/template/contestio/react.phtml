@@ -1,6 +1,28 @@
 <?php
 $iframeUrl = $this->getIframeUrl();
 $queryParams = $this->getQueryParams();
+
+try {
+    $metaData = $this->getMetaTags();
+} catch (Exception $e) {
+    $metaData = array();
+}
+
+$helper = Mage::helper('contestio_connect');
+$defaultTitle = $helper ? $helper->__('Contestio customer community') : 'Contestio customer community';
+$defaultDescription = $helper ? $helper->__('Discover contests, surveys and community news powered by Contestio.') : 'Discover contests, surveys and community news powered by Contestio.';
+
+$iframeTitle = isset($metaData['title']) && !empty($metaData['title'])
+    ? $this->escapeHtml($metaData['title'])
+    : $this->escapeHtml($defaultTitle);
+
+$iframeDescription = isset($metaData['description']) && !empty($metaData['description'])
+    ? $this->escapeHtml($metaData['description'])
+    : $this->escapeHtml($defaultDescription);
+
+$iframeSrc = $iframeUrl . $queryParams;
+$escapedIframeSrc = Mage::helper('core')->escapeUrl($iframeSrc);
+$escapedIframeBaseUrl = Mage::helper('core')->escapeUrl($iframeUrl);
 ?>
 
 <style>
@@ -26,15 +48,66 @@ $queryParams = $this->getQueryParams();
     height: 100%;
     border: none;
   }
+
+  .contestio-seo-intro {
+    margin-bottom: 1.5rem;
+    color: #1F2937;
+  }
+
+  .contestio-seo-intro h2 {
+    font-size: 1.75rem;
+    line-height: 1.3;
+    margin: 0 0 0.75rem;
+  }
+
+  .contestio-seo-intro p {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .contestio-noscript {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: #F9FAFB;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+  }
+
+  .contestio-noscript a {
+    color: #1D4ED8;
+    text-decoration: underline;
+  }
 </style>
+
+<div class="contestio-seo-intro">
+  <h2><?php echo $iframeTitle; ?></h2>
+  <p><?php echo $iframeDescription; ?></p>
+</div>
 
 <div class="contestio-container">
   <iframe
-    src="<?php echo $iframeUrl; ?><?php echo $queryParams; ?>"
+    src="<?php echo $escapedIframeSrc; ?>"
+    data-contestio-base-url="<?php echo $escapedIframeBaseUrl; ?>"
     width="100%"
     height="100%"
+    loading="lazy"
     frameborder="0"
     allowfullscreen
+    title="<?php echo $iframeTitle; ?>"
+    aria-label="<?php echo $iframeTitle; ?>"
     class="contestio-iframe">
   </iframe>
+
 </div>
+
+<noscript>
+  <div class="contestio-noscript">
+    <p>
+      <?php echo $this->escapeHtml($helper ? $helper->__('Activate JavaScript to interact with the Contestio community experience.') : 'Activate JavaScript to interact with the Contestio community experience.'); ?>
+      <a href="<?php echo $escapedIframeSrc; ?>" rel="nofollow">
+        <?php echo $this->escapeHtml($helper ? $helper->__('Access Contestio content') : 'Access Contestio content'); ?>
+      </a>
+    </p>
+  </div>
+</noscript>

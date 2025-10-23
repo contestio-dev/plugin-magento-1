@@ -60,9 +60,16 @@
   }
 
   function normalizeOrigin(url) {
-    if (!url) return null;
+    if (!url || url === 'about:blank' || (typeof url === 'string' && url.startsWith('about:'))) {
+      return null;
+    }
+
     try {
-      const origin = new URL(url).origin;
+      const resolvedUrl =
+        typeof url === 'string' && (url.startsWith('http://') || url.startsWith('https://'))
+          ? new URL(url)
+          : new URL(url, window.location.origin);
+      const origin = resolvedUrl.origin;
       if (origin && origin !== 'null') {
         return origin;
       }
