@@ -42,7 +42,7 @@ class Contestio_Connect_Helper_Meta extends Mage_Core_Helper_Abstract
             'title' => null,
             'image' => null,
             'siteName' => null,
-            'description' => $currentUrl,
+            'description' => null,
             'version' => null,
             'currentUrl' => $currentUrl,
             'canonicalUrl' => $currentUrl,
@@ -63,6 +63,23 @@ class Contestio_Connect_Helper_Meta extends Mage_Core_Helper_Abstract
             }
         } catch (Exception $e) {
             // Silent fail – keep default metadata
+        }
+
+        $defaultHelper = Mage::helper('contestio_connect');
+        if (empty($metaData['title'])) {
+            $metaData['title'] = $defaultHelper
+                ? $defaultHelper->__('Contestio customer community')
+                : 'Contestio customer community';
+        }
+
+        if (empty($metaData['description'])) {
+            $metaData['description'] = $defaultHelper
+                ? $defaultHelper->__('Discover contests, surveys and community news powered by Contestio.')
+                : 'Discover contests, surveys and community news powered by Contestio.';
+        }
+
+        if (empty($metaData['canonicalUrl'])) {
+            $metaData['canonicalUrl'] = $currentUrl;
         }
 
         return $metaData;
