@@ -15,6 +15,7 @@ class Contestio_Connect_Block_React extends Mage_Core_Block_Template
             'description' => $currentUrl,
             'version' => null,
             'currentUrl' => $currentUrl,
+            'canonicalUrl' => $currentUrl,
         );
 
         try {
@@ -30,7 +31,7 @@ class Contestio_Connect_Block_React extends Mage_Core_Block_Template
             $method = 'GET';
     
             $response = $helper->callApi($userAgent, $endpoint, $method, null);
-    
+
             if ($response && is_array($response)) {
                 $metaData = array_merge($metaData, $response);
             }
