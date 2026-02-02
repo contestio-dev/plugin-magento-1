@@ -5,14 +5,14 @@
 
         <reference name="head">
             <action method="setTitle">
-                <title helper="contestio_connect/meta::getTitle" />
+                <title helper="contestio_connect/meta/getTitle" />
             </action>
             <action method="setDescription">
-                <description helper="contestio_connect/meta::getDescription" />
+                <description helper="contestio_connect/meta/getDescription" />
             </action>
             <action method="addLinkRel">
                 <rel>canonical</rel>
-                <href helper="contestio_connect/meta::getCanonical" />
+                <href helper="contestio_connect/meta/getCanonical" />
             </action>
             <block type="contestio_connect/react" name="contestio_meta_tags" template="contestio/meta_tags.phtml" before="-" cacheable="false" />
             <action method="addItem"><type>skin_js</type><name>js/contestio.js</name></action>
