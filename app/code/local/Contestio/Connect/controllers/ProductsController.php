@@ -21,6 +21,7 @@ class Contestio_Connect_ProductsController extends Mage_Core_Controller_Front_Ac
 
             // Paramètres de recherche
             $search = $this->getRequest()->getParam('search');
+            $ids = $this->getRequest()->getParam('ids');
             $pageSize = (int) ($this->getRequest()->getParam('limit') ?: 20);
             $currentPage = (int) ($this->getRequest()->getParam('page') ?: 1);
 
@@ -33,13 +34,24 @@ class Contestio_Connect_ProductsController extends Mage_Core_Controller_Front_Ac
             $collection = Mage::getModel('catalog/product')->getCollection()
                 ->addAttributeToSelect(array('name', 'price', 'small_image', 'url_key'))
                 ->addAttributeToFilter('status', 1) // Actif
-                ->addAttributeToFilter('visibility', array('in' => array(2, 3, 4))) // Visible
-                ->setPageSize($pageSize)
-                ->setCurPage($currentPage);
+                ->addAttributeToFilter('visibility', array('in' => array(2, 3, 4))); // Visible
+
+            // Filtrer par IDs si fournis (pour récupérer des produits spécifiques)
+            if ($ids) {
+                $productIds = array_filter(array_map('trim', explode(',', $ids)));
+                if (!empty($productIds)) {
+                    $collection->addAttributeToFilter('entity_id', array('in' => $productIds));
+                }
+            }
 
             // Filtrer par nom si recherche
             if ($search) {
                 $collection->addAttributeToFilter('name', array('like' => '%' . $search . '%'));
+            }
+
+            // Pagination (seulement si pas de filtre par IDs)
+            if (!$ids) {
+                $collection->setPageSize($pageSize)->setCurPage($currentPage);
             }
 
             // Récupérer le nombre total
