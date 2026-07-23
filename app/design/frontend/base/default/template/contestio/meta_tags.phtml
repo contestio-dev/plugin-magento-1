@@ -14,9 +14,6 @@ if ($headBlock) {
     if (!empty($metaData['description'])) {
         $headBlock->setDescription($metaData['description']);
     }
-    if (!empty($metaData['canonicalUrl'])) {
-        $headBlock->addLinkRel('canonical', $metaData['canonicalUrl']);
-    }
 }
 
 // Card type
