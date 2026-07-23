@@ -24,6 +24,18 @@
         </contestio_connect>
       </updates>
     </layout>
+
+    <events>
+      <core_block_abstract_to_html_before>
+        <observers>
+          <contestio_replace_canonical>
+            <type>singleton</type>
+            <class>Contestio_Connect_Model_Observer</class>
+            <method>replaceContestioCanonical</method>
+          </contestio_replace_canonical>
+        </observers>
+      </core_block_abstract_to_html_before>
+    </events>
   </frontend>
 
   <global>

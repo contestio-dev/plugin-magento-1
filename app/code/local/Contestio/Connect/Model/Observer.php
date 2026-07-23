@@ -1,6 +1,63 @@
 <?php
 class Contestio_Connect_Model_Observer
 {
+    /**
+     * Replace every canonical registered by Magento/theme code with the single
+     * canonical returned by Contestio, only on the Contestio storefront route.
+     */
+    public function replaceContestioCanonical(Varien_Event_Observer $observer)
+    {
+        $block = $observer->getEvent()->getBlock();
+        if (!$block || $block->getNameInLayout() !== 'head') {
+            return $this;
+        }
+
+        $request = Mage::app()->getRequest();
+        if (!$request || $request->getFullActionName() !== 'contestio_connect_index_index') {
+            return $this;
+        }
+
+        $canonical = Mage::helper('contestio_connect/meta')->getCanonical();
+        if (empty($canonical)) {
+            return $this;
+        }
+
+        $items = $block->getData('items');
+        if (is_array($items)) {
+            foreach ($items as $key => $item) {
+                if (
+                    $this->isCanonicalLinkItem($key, $item)
+                    && is_array($item)
+                    && isset($item['name'])
+                ) {
+                    $block->removeItem('link_rel', $item['name']);
+                }
+            }
+        }
+
+        $block->addLinkRel('canonical', $canonical);
+        return $this;
+    }
+
+    protected function isCanonicalLinkItem($key, $item)
+    {
+        $type = is_array($item) && isset($item['type']) ? strtolower($item['type']) : '';
+        $isLinkRel = $type === 'link_rel' || strpos((string) $key, 'link_rel/') === 0;
+        if (!$isLinkRel) {
+            return false;
+        }
+
+        $params = is_array($item) && isset($item['params']) ? $item['params'] : '';
+        if (!is_string($params)) {
+            return false;
+        }
+
+        return preg_match(
+            "/(?:^|\\s)rel\\s*=\\s*(?:\"canonical\"|'canonical'|canonical)(?:\\s|$)/i",
+            $params
+        ) === 1;
+    }
+
     public function onAfterOrderSave(Varien_Event_Observer $observer)
     {        
         $order = $observer->getEvent()->getOrder();

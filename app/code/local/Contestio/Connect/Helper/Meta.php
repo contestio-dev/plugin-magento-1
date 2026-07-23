@@ -37,6 +37,7 @@ class Contestio_Connect_Helper_Meta extends Mage_Core_Helper_Abstract
     {
         $currentUrl = Mage::helper('core/url')->getCurrentUrl();
         $userAgent = Mage::app()->getRequest()->getHeader('User-Agent');
+        $fallbackCanonical = $this->_buildFallbackCanonical($currentUrl);
 
         $metaData = array(
             'title' => null,
@@ -45,7 +46,7 @@ class Contestio_Connect_Helper_Meta extends Mage_Core_Helper_Abstract
             'description' => null,
             'version' => null,
             'currentUrl' => $currentUrl,
-            'canonicalUrl' => $currentUrl,
+            'canonicalUrl' => $fallbackCanonical,
         );
 
         try {
@@ -79,9 +80,28 @@ class Contestio_Connect_Helper_Meta extends Mage_Core_Helper_Abstract
         }
 
         if (empty($metaData['canonicalUrl'])) {
-            $metaData['canonicalUrl'] = $currentUrl;
+            $metaData['canonicalUrl'] = $fallbackCanonical;
         }
 
         return $metaData;
+    }
+
+    /**
+     * Build a stable fallback canonical without crawler-controlled parameters.
+     */
+    protected function _buildFallbackCanonical($currentUrl)
+    {
+        $parts = parse_url($currentUrl);
+        if ($parts === false || empty($parts['scheme']) || empty($parts['host'])) {
+            return null;
+        }
+
+        $canonical = $parts['scheme'] . '://' . $parts['host'];
+        if (isset($parts['port'])) {
+            $canonical .= ':' . $parts['port'];
+        }
+
+        $canonical .= isset($parts['path']) && $parts['path'] !== '' ? $parts['path'] : '/';
+        return $canonical;
     }
 }
