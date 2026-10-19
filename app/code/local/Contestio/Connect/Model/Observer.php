@@ -12,8 +12,7 @@ class Contestio_Connect_Model_Observer
             return $this;
         }
 
-        $request = Mage::app()->getRequest();
-        if (!$request || $request->getFullActionName() !== 'contestio_connect_index_index') {
+        if ($this->getFullActionName() !== 'contestio_connect_index_index') {
             return $this;
         }
 
@@ -37,6 +36,22 @@ class Contestio_Connect_Model_Observer
 
         $block->addLinkRel('canonical', $canonical);
         return $this;
+    }
+
+    /**
+     * Mage_Core_Controller_Request_Http has no getFullActionName(): it only
+     * exists on the action controller. Rebuild it from the request instead.
+     */
+    protected function getFullActionName($delimiter = '_')
+    {
+        $request = Mage::app()->getRequest();
+        if (!$request) {
+            return '';
+        }
+
+        return $request->getRequestedRouteName() . $delimiter
+            . $request->getRequestedControllerName() . $delimiter
+            . $request->getRequestedActionName();
     }
 
     protected function isCanonicalLinkItem($key, $item)
